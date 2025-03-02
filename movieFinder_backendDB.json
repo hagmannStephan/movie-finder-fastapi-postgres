@@ -1,0 +1,86 @@
+{
+  "v": 6,
+  "name": "movieFinder_backendDB",
+  "folders": [
+    {
+      "v": 6,
+      "name": "Error",
+      "folders": [],
+      "requests": [],
+      "auth": {
+        "authType": "inherit",
+        "authActive": true
+      },
+      "headers": [],
+      "_ref_id": "coll_m7rt3zv0_1a9363c1-4ce4-45d2-b8aa-af0db01088dc"
+    }
+  ],
+  "requests": [
+    {
+      "v": "11",
+      "name": "/",
+      "method": "GET",
+      "endpoint": "http://127.0.0.1:8000",
+      "params": [],
+      "headers": [],
+      "preRequestScript": "",
+      "testScript": "// Check status code is 200\npw.test(\"Status code is 200\", ()=> {\n    pw.expect(pw.response.status).toBe(200);\n});\n\n// Check JSON response property\npw.test(\"Check JSON response property\", ()=> {pw.expect(pw.response.headers[1].value).toBe(\"application/json\");\n});\n\n// Check content\npw.test(\"Check if response is as expected\", ()=>{\n  console.log(pw.response.body);\n  pw.expect(pw.response.body.Hello).toBe(\"World\");\n});",
+      "auth": {
+        "authType": "inherit",
+        "authActive": true
+      },
+      "body": {
+        "contentType": null,
+        "body": null
+      },
+      "requestVariables": [],
+      "responses": {}
+    },
+    {
+      "v": "11",
+      "name": "/items",
+      "method": "POST",
+      "endpoint": "http://127.0.0.1:8000/items",
+      "params": [],
+      "headers": [],
+      "preRequestScript": "",
+      "testScript": "\n\n// Check status code is 200\npw.test(\"Status code is 200\", ()=> {\n    pw.expect(pw.response.status).toBe(200);\n});",
+      "auth": {
+        "authType": "inherit",
+        "authActive": true
+      },
+      "body": {
+        "contentType": "application/json",
+        "body": "{\n  \"name\": \"myNewTestItem\",\n  \"description\": \"This is some description\",\n  \"price\": 10\n}"
+      },
+      "requestVariables": [],
+      "responses": {}
+    },
+    {
+      "v": "11",
+      "name": "/items",
+      "method": "GET",
+      "endpoint": "http://127.0.0.1:8000/items",
+      "params": [],
+      "headers": [],
+      "preRequestScript": "",
+      "testScript": "\n\n// Check status code is 200\npw.test(\"Status code is 200\", ()=> {\n    pw.expect(pw.response.status).toBe(200);\n});",
+      "auth": {
+        "authType": "inherit",
+        "authActive": true
+      },
+      "body": {
+        "contentType": null,
+        "body": null
+      },
+      "requestVariables": [],
+      "responses": {}
+    }
+  ],
+  "auth": {
+    "authType": "none",
+    "authActive": true
+  },
+  "headers": [],
+  "_ref_id": "coll_m7rt3urs_8d95c708-d4dc-4a6a-a34e-de857d6927df"
+}
