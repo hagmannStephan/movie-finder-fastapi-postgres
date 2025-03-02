@@ -10,6 +10,8 @@ fastapi dev main.py
 fastapi run
 ```
 ### Download Requirements
+The requirements should get installed automatically if you start a dev-container, but just in case:
+
 ```shell
 pip install -r requirements.txt
 ```
@@ -35,4 +37,4 @@ pip freeze > requirements.txt
 Checkout the API-Doc under this URL: [http://127.0.0.1:8000/docs](http://127.0.0.1:8000/docs)
 
 ### Import Hoppscotch-Collection
-The collection with the file-name `placeholder` can be imported into Hoppscotch. There are also tests configured to check if the endpoints are according as excpected.
+The collection with the file-name `movieFinder_backendDB.json` can be imported into Hoppscotch. There are also tests configured to check if the endpoints are according as excpected.
