@@ -44,3 +44,4 @@ Checkout the API-Doc under this URL: [http://127.0.0.1:8000/docs](http://127.0.0
 
 ### Import Hoppscotch-Collection
 The collection with the file-name `movieFinder_backendDB.json` can be imported into Hoppscotch. There are also tests configured to check if the endpoints are according as excpected.
+For everything to work properly you'll need to setup a personal environment with the secrets `access_token` and `refresh_token`.

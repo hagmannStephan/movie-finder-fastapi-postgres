@@ -6,7 +6,28 @@
       "v": 6,
       "name": "Error",
       "folders": [],
-      "requests": [],
+      "requests": [
+        {
+          "v": "11",
+          "name": "/users/me",
+          "method": "GET",
+          "endpoint": "http://127.0.0.1:8000/users/me",
+          "params": [],
+          "headers": [],
+          "preRequestScript": "",
+          "testScript": "\n\n// Check status code is 401\npw.test(\"Status code is 401\", ()=> {\n    pw.expect(pw.response.status).toBe(401);\n});",
+          "auth": {
+            "authType": "none",
+            "authActive": true
+          },
+          "body": {
+            "contentType": null,
+            "body": null
+          },
+          "requestVariables": [],
+          "responses": {}
+        }
+      ],
       "auth": {
         "authType": "inherit",
         "authActive": true
@@ -38,9 +59,9 @@
     },
     {
       "v": "11",
-      "name": "/items",
+      "name": "/users",
       "method": "POST",
-      "endpoint": "http://127.0.0.1:8000/items",
+      "endpoint": "http://127.0.0.1:8000/users",
       "params": [],
       "headers": [],
       "preRequestScript": "",
@@ -51,16 +72,16 @@
       },
       "body": {
         "contentType": "application/json",
-        "body": "{\n  \"name\": \"myNewTestItem\",\n  \"description\": \"This is some description\",\n  \"price\": 10\n}"
+        "body": "{\n  \"name\": \"Stephan\",\n  \"password\": \"securePass123!\"\n}"
       },
       "requestVariables": [],
       "responses": {}
     },
     {
       "v": "11",
-      "name": "/items",
-      "method": "GET",
-      "endpoint": "http://127.0.0.1:8000/items",
+      "name": "/token",
+      "method": "POST",
+      "endpoint": "http://127.0.0.1:8000/token",
       "params": [],
       "headers": [],
       "preRequestScript": "",
@@ -70,6 +91,47 @@
         "authActive": true
       },
       "body": {
+        "contentType": "application/x-www-form-urlencoded",
+        "body": "username: Stephan\npassword: securePass123!"
+      },
+      "requestVariables": [],
+      "responses": {}
+    },
+    {
+      "v": "11",
+      "endpoint": "http://127.0.0.1:8000/token/refresh",
+      "name": "/token/refresh",
+      "params": [],
+      "headers": [],
+      "method": "POST",
+      "auth": {
+        "authType": "inherit",
+        "authActive": true
+      },
+      "preRequestScript": "",
+      "testScript": "\n\n// Check status code is 200\npw.test(\"Status code is 200\", ()=> {\n    pw.expect(pw.response.status).toBe(200);\n});",
+      "body": {
+        "contentType": "application/json",
+        "body": "{\n  \"refresh_token\": \"<<refresh_token>>\"\n}"
+      },
+      "requestVariables": [],
+      "responses": {}
+    },
+    {
+      "v": "11",
+      "endpoint": "http://127.0.0.1:8000/users/me",
+      "name": "/users/me",
+      "params": [],
+      "headers": [],
+      "method": "GET",
+      "auth": {
+        "authType": "inherit",
+        "authActive": true,
+        "token": ""
+      },
+      "preRequestScript": "",
+      "testScript": "",
+      "body": {
         "contentType": null,
         "body": null
       },
@@ -78,8 +140,20 @@
     }
   ],
   "auth": {
-    "authType": "none",
-    "authActive": true
+    "authActive": true,
+    "authType": "bearer",
+    "addTo": "HEADERS",
+    "grantTypeInfo": {
+      "authEndpoint": "",
+      "tokenEndpoint": "",
+      "clientID": "",
+      "clientSecret": "",
+      "isPKCE": false,
+      "codeVerifierMethod": "S256",
+      "grantType": "AUTHORIZATION_CODE",
+      "token": ""
+    },
+    "token": "<<access_token>>"
   },
   "headers": [],
   "_ref_id": "coll_m7rt3urs_8d95c708-d4dc-4a6a-a34e-de857d6927df"
