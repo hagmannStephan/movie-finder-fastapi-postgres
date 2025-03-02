@@ -1,16 +1,31 @@
 from pydantic import BaseModel
+from typing import Optional
 
-# Models for testing purposes
-class ItemBase(BaseModel):
+
+# User Models
+class UserBase(BaseModel):
     name: str
-    description: str | None = None
-    price: float
 
-class ItemCreate(ItemBase):
-    pass
 
-class Item(ItemBase):
+class UserCreate(UserBase):
+    password: str
+
+
+class User(UserBase):
     id: int
 
     class Config:
         from_attributes = True
+
+
+# Token Models
+class Token(BaseModel):
+    access_token: str
+    refresh_token: str
+    token_type: str
+
+class TokenData(BaseModel):
+    username: Optional[str] = None
+
+class RefreshToken(BaseModel):
+    refresh_token: str
