@@ -1,6 +1,7 @@
 # Movie Finder - Backend
 ## Development - Cheat Sheet
 ### Run Dev-Server
+The project should start automatically once the dev container gets booted up, but if you want to start it manually:
 ```shell
 fastapi dev main.py
 ```
@@ -26,6 +27,11 @@ POSTGRES_DB=""
 
 REDIS_HOST=""
 REDIS_PORT=""
+
+SECRET_KEY =""
+ACCESS_TOKEN_EXPIRE_MINUTES=""
+REFRESH_TOKEN_EXPIRE_DAYS=""
+ALGORITHM=""
 ```
 
 ### Freeze Requirements

@@ -1,10 +1,8 @@
 from .database import Base
-from sqlalchemy import Column, Integer, String, Float
+from sqlalchemy import Column, Integer, String
 
-# Model for testing purposes
-class Item(Base):
-    __tablename__ = "items"
+class User(Base):
+    __tablename__ = "users"
     id = Column(Integer, primary_key=True, index=True)
-    name = Column(String, index=True)
-    description = Column(String)
-    price = Column(Float)
+    name = Column(String, unique=True, index=True)
+    password = Column(String)

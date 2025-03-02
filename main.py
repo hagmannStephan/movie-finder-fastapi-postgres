@@ -1,7 +1,7 @@
-from fastapi import FastAPI, Depends
+from fastapi import FastAPI, Depends, HTTPException, status
 from sqlalchemy.orm import Session
-from typing import List
-from resources.postgres.database import engine, SessionLocal
+from resources.postgres.database import engine, SessionLocal, get_db
+from resources.auth.auth import get_password_hash, verify_password
 import resources.postgres.models as models
 import resources.postgres.schemas as schemas
 
@@ -13,33 +13,31 @@ app = FastAPI(
 
 models.Base.metadata.create_all(bind=engine)
 
-def get_db():
-    db = SessionLocal()
-    try:
-        yield db
-    finally:
-        db.close()
-
 
 @app.get("/", tags=["Root"])
 def read_root():
     return {"Hello": "World"}
 
 
-@app.post("/items", response_model=schemas.Item, tags=["Items"])
-def create_item(item: schemas.ItemCreate, db: Session = Depends(get_db)):
-    db_item = models.Item(
-        **item.model_dump()
-	)
+@app.post("/users", response_model=schemas.User, tags=["Auth"])
+def create_user(user: schemas.UserCreate, db: Session = Depends(get_db)):
+    # Check if user already exists
+    db_user = db.query(models.User).filter(models.User.name == user.name).first()
+    if db_user:
+        raise HTTPException(
+            status_code=status.HTTP_400_BAD_REQUEST,
+            detail="Username already registered"
+        )
 
-    db.add(db_item)
-    db.commit()
-    db.refresh(db_item)
-
-    return db_item
-
-@app.get("/items", response_model=List[schemas.Item], tags=["Items"])
-def read_items(skip: int = 0, limit: int = 10, db: Session = Depends(get_db)):
-    items = db.query(models.Item).offset(skip).limit(limit).all()
+    # Create new user with hashed password
+    hashed_password = get_password_hash(user.password)
+    db_user = models.User(
+        name=user.name,
+        password=hashed_password
+    )
     
-    return items
+    db.add(db_user)
+    db.commit()
+    db.refresh(db_user)
+    
+    return db_user
