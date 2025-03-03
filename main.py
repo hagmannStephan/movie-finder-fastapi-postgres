@@ -2,15 +2,16 @@ from fastapi import FastAPI, Depends, HTTPException, status
 from fastapi.security import OAuth2PasswordRequestForm
 from sqlalchemy.orm import Session
 from datetime import timedelta
-from resources.postgres.database import engine, get_db
-from resources.auth.auth import (
+from resources.services.postgresql_service import engine, get_db
+from resources.services.auth_service import (
     get_password_hash, verify_password, get_user_by_name, 
     create_access_token, create_refresh_token, get_current_user
 )
 from dotenv import load_dotenv
 from jose import jwt, JWTError
-import resources.postgres.models as models
-import resources.postgres.schemas as schemas
+import resources.models.postgres as postgers_models
+from resources.services.postgresql_service import Base
+import resources.schemas as schemas
 import os
 
 load_dotenv()
@@ -26,7 +27,7 @@ app = FastAPI(
     version="0.1.0"
 )
 
-models.Base.metadata.create_all(bind=engine)
+Base.metadata.create_all(bind=engine)
 
 
 @app.get("/", tags=["Test"])
@@ -44,7 +45,7 @@ def read_root():
 @app.post("/users", response_model=schemas.User, tags=["Authentication"])
 def create_user(user: schemas.UserCreate, db: Session = Depends(get_db)):
     # Check if user already exists
-    db_user = db.query(models.User).filter(models.User.name == user.name).first()
+    db_user = db.query(postgers_models.User).filter(postgers_models.User.name == user.name).first()
     if db_user:
         raise HTTPException(
             status_code=status.HTTP_400_BAD_REQUEST,
@@ -53,7 +54,7 @@ def create_user(user: schemas.UserCreate, db: Session = Depends(get_db)):
 
     # Create new user with hashed password
     hashed_password = get_password_hash(user.password)
-    db_user = models.User(
+    db_user = postgers_models.User(
         name=user.name,
         password=hashed_password
     )
@@ -137,5 +138,5 @@ async def refresh_token(token_data: schemas.RefreshToken, db: Session = Depends(
 
 # Return current user
 @app.get("/users/me", tags=["Test", "Authentication"])
-def read_root(current_user: models.User = Depends(get_current_user)):
+def read_root(current_user: postgers_models.User = Depends(get_current_user)):
     return current_user
