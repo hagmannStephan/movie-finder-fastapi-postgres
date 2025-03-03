@@ -24,5 +24,5 @@ class Group(Base):
     
 
     __table_args__ = (
-        CheckConstraint('show_movies = true OR show_series = true', name='check_at_least_one_true'),
+        CheckConstraint('groups.show_movies = true OR groups.show_tv = true', name='check_at_least_one_true'),
     )
