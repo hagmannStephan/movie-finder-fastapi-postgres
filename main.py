@@ -16,6 +16,9 @@ Base.metadata.create_all(bind=engine)
 # `auth`-Endpoints
 app.include_router(routers.auth_router)
 
+# `movie`-Endpoints
+app.include_router(routers.movie_router)
+
 @app.get("/", tags=["Root"])
 def read_root():
     return {"Hello": "World"}
