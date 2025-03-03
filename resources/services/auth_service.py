@@ -1,15 +1,15 @@
 import os
-import resources.postgres.models as models
+import resources.models.postgres as postgers_models
 from fastapi import Depends, HTTPException, status
 from datetime import datetime, timedelta, timezone
 from typing import Optional
 from jose import JWTError, jwt
 from dotenv import load_dotenv
-from resources.postgres.schemas import TokenData
+from resources.schemas import TokenData
 from passlib.context import CryptContext
 from fastapi.security import OAuth2PasswordBearer
 from sqlalchemy.orm import Session
-from resources.postgres.database import get_db
+from resources.services.postgresql_service import get_db
 
 load_dotenv()
 
@@ -57,7 +57,7 @@ def create_refresh_token(data: dict, expires_delta: Optional[timedelta] = None):
     return encoded_jwt
 
 def get_user_by_name(db: Session, name: str):
-    return db.query(models.User).filter(models.User.name == name).first()
+    return db.query(postgers_models.User).filter(postgers_models.User.name == name).first()
 
 async def get_current_user(token: str = Depends(oauth2_scheme), db: Session = Depends(get_db)):
     credentials_exception = HTTPException(

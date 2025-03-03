@@ -9,9 +9,9 @@
       "requests": [
         {
           "v": "11",
-          "name": "/users/me",
+          "name": "/auth/users/me",
           "method": "GET",
-          "endpoint": "http://127.0.0.1:8000/users/me",
+          "endpoint": "http://127.0.0.1:8000/auth/users/me",
           "params": [],
           "headers": [],
           "preRequestScript": "",
@@ -23,6 +23,26 @@
           "body": {
             "contentType": null,
             "body": null
+          },
+          "requestVariables": [],
+          "responses": {}
+        },
+        {
+          "v": "11",
+          "name": "/auth/token",
+          "method": "POST",
+          "endpoint": "http://127.0.0.1:8000/auth/token",
+          "params": [],
+          "headers": [],
+          "preRequestScript": "",
+          "testScript": "\n\n// Check status code is 200\npw.test(\"Status code is 200\", ()=> {\n    pw.expect(pw.response.status).toBe(200);\n});",
+          "auth": {
+            "authType": "inherit",
+            "authActive": true
+          },
+          "body": {
+            "contentType": "application/x-www-form-urlencoded",
+            "body": "username: Stephan\npassword: securePass123!123"
           },
           "requestVariables": [],
           "responses": {}
@@ -59,9 +79,9 @@
     },
     {
       "v": "11",
-      "name": "/users",
+      "name": "/auth/users",
       "method": "POST",
-      "endpoint": "http://127.0.0.1:8000/users",
+      "endpoint": "http://127.0.0.1:8000/auth/users",
       "params": [],
       "headers": [],
       "preRequestScript": "",
@@ -79,9 +99,9 @@
     },
     {
       "v": "11",
-      "name": "/token",
+      "name": "/auth/token",
       "method": "POST",
-      "endpoint": "http://127.0.0.1:8000/token",
+      "endpoint": "http://127.0.0.1:8000/auth/token",
       "params": [],
       "headers": [],
       "preRequestScript": "",
@@ -99,17 +119,17 @@
     },
     {
       "v": "11",
-      "endpoint": "http://127.0.0.1:8000/token/refresh",
-      "name": "/token/refresh",
+      "name": "/auth/token/refresh",
+      "method": "POST",
+      "endpoint": "https://localhost:8000/auth/token/refresh",
       "params": [],
       "headers": [],
-      "method": "POST",
+      "preRequestScript": "",
+      "testScript": "",
       "auth": {
         "authType": "inherit",
         "authActive": true
       },
-      "preRequestScript": "",
-      "testScript": "\n\n// Check status code is 200\npw.test(\"Status code is 200\", ()=> {\n    pw.expect(pw.response.status).toBe(200);\n});",
       "body": {
         "contentType": "application/json",
         "body": "{\n  \"refresh_token\": \"<<refresh_token>>\"\n}"
@@ -119,18 +139,17 @@
     },
     {
       "v": "11",
-      "endpoint": "http://127.0.0.1:8000/users/me",
-      "name": "/users/me",
+      "name": "/auth/users/me",
+      "method": "GET",
+      "endpoint": "http://127.0.0.1:8000/auth/users/me",
       "params": [],
       "headers": [],
-      "method": "GET",
-      "auth": {
-        "authType": "inherit",
-        "authActive": true,
-        "token": ""
-      },
       "preRequestScript": "",
       "testScript": "",
+      "auth": {
+        "authType": "inherit",
+        "authActive": true
+      },
       "body": {
         "contentType": null,
         "body": null
@@ -142,17 +161,6 @@
   "auth": {
     "authActive": true,
     "authType": "bearer",
-    "addTo": "HEADERS",
-    "grantTypeInfo": {
-      "authEndpoint": "",
-      "tokenEndpoint": "",
-      "clientID": "",
-      "clientSecret": "",
-      "isPKCE": false,
-      "codeVerifierMethod": "S256",
-      "grantType": "AUTHORIZATION_CODE",
-      "token": ""
-    },
     "token": "<<access_token>>"
   },
   "headers": [],
