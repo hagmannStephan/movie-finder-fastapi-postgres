@@ -26,7 +26,7 @@ services:
     networks:
       - dev-network
     ports:
-      - "5432:5432"   # Ensure that it matches the port in the .env file
+      - "127.0.0.1:5432:5432"   # Ensure that it matches the port in the .env file
 
   redis:
     image: redis:7
@@ -36,8 +36,7 @@ services:
     networks:
       - dev-network
     ports:
-      - "6379:6379"  # Ensure that it matches the port in the .env file
-
+      - "127.0.0.1:6379:6379"  # Ensure that it matches the port in the .env file
 networks:
   dev-network:
 
