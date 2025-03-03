@@ -127,5 +127,5 @@ async def refresh_token(token_data: schemas.RefreshToken, db: Session = Depends(
 
 # Return current user
 @router.get("/users/me", response_model=schemas.User)
-def read_root(current_user: postgers_models.User = Depends(get_current_user)):
+def read_current_user(current_user: postgers_models.User = Depends(get_current_user)):
     return current_user

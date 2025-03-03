@@ -10,7 +10,7 @@
 	// "features": {},
 
 	// Use 'forwardPorts' to make a list of ports inside the container available locally.
-	"forwardPorts": [5432, 6379, 8000],		// Ensure that it matches with ports in .env and docker-compose.yaml
+	"forwardPorts": [8000],		// Ensure that it matches with ports in .env and docker-compose.yaml
 
 	// Use 'postCreateCommand' to run commands after the container is created.
 	"postCreateCommand": "[ -f requirements.txt ] && pip install -r requirements.txt || echo 'No requirements.txt found'",
