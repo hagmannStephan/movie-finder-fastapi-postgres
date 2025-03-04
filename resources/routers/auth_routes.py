@@ -31,7 +31,7 @@ router = APIRouter(
 )
 
 # Register Endpoint
-@router.post("/users", response_model=schemas.User, tags=["Authentication"])
+@router.post("/users", response_model=schemas.User)
 def create_user(user: schemas.UserCreate, db: Session = Depends(get_db)):
     # Check if user already exists
     db_user = db.query(postgers_models.User).filter(postgers_models.User.name == user.name).first()
