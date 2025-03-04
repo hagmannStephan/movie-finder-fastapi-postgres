@@ -6,8 +6,10 @@ from sqlalchemy import (
 class User(Base):
     __tablename__ = "users"
     user_id = Column(Integer, primary_key=True, index=True)
-    name = Column(String(25), nullable=False, index=True)
+    name = Column(String(25), nullable=False)
+    email = Column(String(50), nullable=False, unique=True, index=True)
     password = Column(String(50), nullable=False)
+    friend_code = Column(String(5), nullable=False, unique=True, fixed=True)
     created_on = Column(Date, nullable=False, default='now()')
     last_login = Column(Date, nullable=True)
 
