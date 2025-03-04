@@ -6,7 +6,7 @@ import resources.routers as routers
  
 app = FastAPI(
     title="Movie Finder - Backend",
-    description="FastAPI backend with PostgreSQL and Redis",
+    description="MovieFinder Backend with FastAPi and PostgreSQL",
     version="0.1.0"
 )
 
