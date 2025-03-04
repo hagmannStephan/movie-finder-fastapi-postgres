@@ -4,8 +4,8 @@ from sqlalchemy.orm import Session
 from datetime import timedelta
 from resources.services.postgresql_service import get_db
 from resources.services.auth_service import (
-    get_password_hash, verify_password, get_user_by_name, 
-    create_access_token, create_refresh_token, get_current_user
+    verify_password, get_user_by_name, 
+    create_access_token, create_refresh_token
 )
 from jose import jwt, JWTError
 import resources.models.postgres as postgers_models
@@ -22,38 +22,10 @@ REFRESH_TOKEN_EXPIRE_DAYS = int(os.getenv('REFRESH_TOKEN_EXPIRE_DAYS'))
 
 router = APIRouter(
     prefix="/auth",
-    tags=["Authentication"],
-        responses={
-        400: {"description": "Username already registered"},
-        401: {"description": "Incorrect username or password - Could not validate credentials"},
-        200: {"description": "Success"}
-    }
+    tags=["Authentication"]
 )
 
-# Register Endpoint
-@router.post("/users", response_model=schemas.User)
-def create_user(user: schemas.UserCreate, db: Session = Depends(get_db)):
-    # Check if user already exists
-    db_user = db.query(postgers_models.User).filter(postgers_models.User.name == user.name).first()
-    if db_user:
-        raise HTTPException(
-            status_code=status.HTTP_400_BAD_REQUEST,
-            detail="Username already registered"
-        )
-
-    # Create new user with hashed password
-    hashed_password = get_password_hash(user.password)
-    db_user = postgers_models.User(
-        name=user.name,
-        password=hashed_password
-    )
-    
-    db.add(db_user)
-    db.commit()
-    db.refresh(db_user)
-    
-    return db_user
-
+# TODO: Add responses to endpoints 
 
 # Token login endpoint
 @router.post("/token", response_model=schemas.Token)
@@ -123,9 +95,3 @@ async def refresh_token(token_data: schemas.RefreshToken, db: Session = Depends(
         }
     except JWTError:
         raise credentials_exception
-    
-
-# Return current user
-@router.get("/users/me", response_model=schemas.User)
-def read_current_user(current_user: postgers_models.User = Depends(get_current_user)):
-    return current_user
