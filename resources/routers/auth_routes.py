@@ -3,11 +3,10 @@ from sqlalchemy.orm import Session
 from datetime import timedelta
 from resources.services.postgresql_service import get_db
 from resources.services.auth_service import (
-    verify_password, get_user_by_name, get_user_by_email,
+    verify_password, get_user_by_email,
     create_access_token, create_refresh_token
 )
 from jose import jwt, JWTError
-import resources.models.postgres as postgers_models
 import resources.schemas as schemas
 from dotenv import load_dotenv
 import os
