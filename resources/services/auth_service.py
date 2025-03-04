@@ -59,6 +59,9 @@ def create_refresh_token(data: dict, expires_delta: Optional[timedelta] = None):
 def get_user_by_name(db: Session, name: str):
     return db.query(postgers_models.User).filter(postgers_models.User.name == name).first()
 
+def get_user_by_email(db: Session, email: str):
+    return db.query(postgers_models.User).filter(postgers_models.User.email == email).first()
+
 async def get_current_user(token: str = Depends(oauth2_scheme), db: Session = Depends(get_db)):
     credentials_exception = HTTPException(
         status_code=status.HTTP_401_UNAUTHORIZED,

@@ -1,10 +1,9 @@
-from fastapi import Depends, HTTPException, status, APIRouter
-from fastapi.security import OAuth2PasswordRequestForm
+from fastapi import Depends, HTTPException, status, APIRouter, Form
 from sqlalchemy.orm import Session
 from datetime import timedelta
 from resources.services.postgresql_service import get_db
 from resources.services.auth_service import (
-    verify_password, get_user_by_name, 
+    verify_password, get_user_by_name, get_user_by_email,
     create_access_token, create_refresh_token
 )
 from jose import jwt, JWTError
@@ -29,9 +28,13 @@ router = APIRouter(
 
 # Token login endpoint
 @router.post("/token", response_model=schemas.Token)
-async def login_for_access_token(form_data: OAuth2PasswordRequestForm = Depends(), db: Session = Depends(get_db)):
-    user = get_user_by_name(db, form_data.username)
-    if not user or not verify_password(form_data.password, user.password):
+async def login_for_access_token(
+    email: str = Form(...),
+    password: str = Form(...),
+    db: Session = Depends(get_db)
+):
+    user = get_user_by_email(db, email)
+    if not user or not verify_password(password, user.password):
         raise HTTPException(
             status_code=status.HTTP_401_UNAUTHORIZED,
             detail="Incorrect username or password",
@@ -41,12 +44,12 @@ async def login_for_access_token(form_data: OAuth2PasswordRequestForm = Depends(
     # Create tokens
     access_token_expires = timedelta(minutes=ACCESS_TOKEN_EXPIRE_MINUTES)
     access_token = create_access_token(
-        data={"sub": user.name}, expires_delta=access_token_expires
+        data={"sub": user.email}, expires_delta=access_token_expires
     )
     
     refresh_token_expires = timedelta(days=REFRESH_TOKEN_EXPIRE_DAYS)
     refresh_token = create_refresh_token(
-        data={"sub": user.name}, expires_delta=refresh_token_expires
+        data={"sub": user.email}, expires_delta=refresh_token_expires
     )
     
     return {
@@ -58,7 +61,7 @@ async def login_for_access_token(form_data: OAuth2PasswordRequestForm = Depends(
 
 # Refresh token endpoint
 @router.post("/token/refresh", response_model=schemas.Token)
-async def refresh_token(token_data: schemas.RefreshToken, db: Session = Depends(get_db)):
+async def refresh_token(refresh_token: str = Form(...), db: Session = Depends(get_db)):
     credentials_exception = HTTPException(
         status_code=status.HTTP_401_UNAUTHORIZED,
         detail="Could not validate credentials",
@@ -66,26 +69,26 @@ async def refresh_token(token_data: schemas.RefreshToken, db: Session = Depends(
     )
     
     try:
-        payload = jwt.decode(token_data.refresh_token, SECRET_KEY, algorithms=[ALGORITHM])
-        username: str = payload.get("sub")
+        payload = jwt.decode(refresh_token, SECRET_KEY, algorithms=[ALGORITHM])
+        email: str = payload.get("sub")
         token_type: str = payload.get("type")
         
-        if username is None or token_type != "refresh":
+        if email is None or token_type != "refresh":
             raise credentials_exception
             
-        user = get_user_by_name(db, username)
+        user = get_user_by_email(db, email)
         if user is None:
             raise credentials_exception
             
         # Create new tokens
         access_token_expires = timedelta(minutes=ACCESS_TOKEN_EXPIRE_MINUTES)
         access_token = create_access_token(
-            data={"sub": user.name}, expires_delta=access_token_expires
+            data={"sub": user.email}, expires_delta=access_token_expires
         )
         
         refresh_token_expires = timedelta(days=REFRESH_TOKEN_EXPIRE_DAYS)
         new_refresh_token = create_refresh_token(
-            data={"sub": user.name}, expires_delta=refresh_token_expires
+            data={"sub": user.email}, expires_delta=refresh_token_expires
         )
         
         return {
