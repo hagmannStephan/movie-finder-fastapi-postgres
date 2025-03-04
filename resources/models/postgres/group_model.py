@@ -1,6 +1,6 @@
 from ...services.postgresql_service import Base
 from sqlalchemy import (
-    Column, Integer, String, Date, JSON, Boolean, CheckConstraint
+    Column, Integer, String, Date, JSON, Boolean, CheckConstraint, ForeignKey
 )
 
 class Group(Base):
@@ -8,6 +8,7 @@ class Group(Base):
     group_id = Column(Integer, primary_key=True, index=True)
     name = Column(String(25), nullable=False, index=True)
     password = Column(String(50), nullable=False)
+    admin_id = Column(Integer, ForeignKey('users.user_id'), nullable=False)
     created_on = Column(Date, nullable=False, default='now()')
 
     # Metadata about movie preferences
