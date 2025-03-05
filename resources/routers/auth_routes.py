@@ -19,14 +19,20 @@ ALGORITHM = os.getenv("ALGORITHM")
 REFRESH_TOKEN_EXPIRE_DAYS = int(os.getenv('REFRESH_TOKEN_EXPIRE_DAYS'))
 
 router = APIRouter(
-    prefix="/auth",
+    prefix="/auth/token",
     tags=["Authentication"]
 )
 
-# TODO: Add responses to endpoints 
 
-# Token login endpoint
-@router.post("/token", response_model=schemas.Token)
+@router.post(
+    "/", 
+    response_model=schemas.Token,
+    description="Get access token",
+    responses={
+        401: {"description": "Incorrect username or password"},
+        200: {"description": "Token created"}
+    }
+)
 async def login_for_access_token(
     email: str = Form(...),
     password: str = Form(...),
@@ -58,8 +64,15 @@ async def login_for_access_token(
     }
 
 
-# Refresh token endpoint
-@router.post("/token/refresh", response_model=schemas.Token)
+@router.post(
+    "/refresh", 
+    response_model=schemas.Token,
+    description="Refresh access token",
+    responses={
+        401: {"description": "Invalid token"},
+        200: {"description": "Token refreshed"}
+    }
+)
 async def refresh_token(refresh_token: str = Form(...), db: Session = Depends(get_db)):
     credentials_exception = HTTPException(
         status_code=status.HTTP_401_UNAUTHORIZED,

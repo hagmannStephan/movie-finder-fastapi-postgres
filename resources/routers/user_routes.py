@@ -52,7 +52,23 @@ def create_user(user: schemas.UserCreate, db: Session = Depends(get_db)):
     
     return db_user
 
-# Return current user
-@router.get("/me", response_model=schemas.User)
+
+@router.get(
+        "/me", 
+        response_model=schemas.User,
+        description="Get current user",
+        responses={
+            200: {"description": "User found"},
+            401: {"description": "User not authenticated"}
+        }
+)
 def read_current_user(current_user: postgers_models.User = Depends(get_current_user)):
     return current_user
+
+# --------------------------------------------------------------------------------------------
+# - GET     /users/{id}/favourites
+# - DELETE  /users/{id}/favourites/{movieId}
+# - PATCH   /users/{id}/settings
+# - DELETE  /users/{id}
+# - GET     /users/{id}/groups
+# --------------------------------------------------------------------------------------------
