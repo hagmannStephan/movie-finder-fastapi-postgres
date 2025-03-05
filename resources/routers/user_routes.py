@@ -108,6 +108,24 @@ def remove_user_favourite(id: int, movieId: int, current_user: postgers_models.U
             status_code=status.HTTP_404_NOT_FOUND,
             detail="Movie not found"
         )
+    
+
+@router.patch(
+        "/{id}/settings",
+        response_model=schemas.User,
+        description="Update user settings",
+        responses={
+            200: {"description": "Settings updated"},
+            401: {"description": "User not authorized"}
+        }
+)
+def update_user_settings(id: int, settings: schemas.UserPatchSettings, current_user: postgers_models.User = Depends(get_current_user), db: Session = Depends(get_db)):
+    if current_user.user_id != id:
+        raise HTTPException(
+            status_code=status.HTTP_401_UNAUTHORIZED,
+            detail="User not authorized"
+        )
+    return user_service.update_user_settings(id, settings, db)
 
 # --------------------------------------------------------------------------------------------
 # - PATCH   /users/{id}/settings

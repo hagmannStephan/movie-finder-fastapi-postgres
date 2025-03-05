@@ -32,4 +32,15 @@ def remove_user_favourite(
             return movie
         
     raise Exception("Movie not found in user's favourites")
+
+def update_user_settings(
+        id: int,
+        settings: schemas.UserPatchSettings,
+        db: Session = Depends(get_db)
+) -> schemas.UserPatchSettings:
+    user = db.query(postgers_models.User).filter(postgers_models.User.user_id == id).first()
+    for key, value in settings.dict().items():
+        setattr(user, key, value)
+    db.commit()
+    return settings
     
