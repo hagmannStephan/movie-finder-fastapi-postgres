@@ -1,6 +1,12 @@
-from .user_model import User
-from .group_model import Group
-from .movie_model import Movie
-from .associations_models import user_movies, group_matches, group_users
+import pkgutil
+import importlib
 
-__all__ = ["User", "Group", "Movie", "user_movies", "group_matches", "group_users"]
+__all__ = []
+
+# Dynamically import all modules in the current package
+for loader, module_name, is_pkg in pkgutil.walk_packages(__path__):
+    module = importlib.import_module(f".{module_name}", package=__name__)
+    # Get all public attributes (not starting with '_')
+    public_attrs = [attr for attr in dir(module) if not attr.startswith("_")]
+    __all__.extend(public_attrs)
+    globals().update({attr: getattr(module, attr) for attr in public_attrs})

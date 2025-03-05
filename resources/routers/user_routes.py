@@ -5,6 +5,7 @@ from sqlalchemy.orm import Session
 import resources.models.postgres as postgers_models
 import secrets
 from resources.services.auth_service import get_password_hash, get_current_user
+import resources.services.user_service as user_service
 
 router = APIRouter(
     prefix="/users",
@@ -65,8 +66,26 @@ def create_user(user: schemas.UserCreate, db: Session = Depends(get_db)):
 def read_current_user(current_user: postgers_models.User = Depends(get_current_user)):
     return current_user
 
+
+@router.get(
+        "/{id}/favourites",
+        response_model=list[schemas.Movie],
+        description="Get liked movies of a user",
+        responses={
+            200: {"description": "User found"},
+            401: {"description": "User not authorized"}
+        }
+)
+def get_user_favourites(id: int, current_user: postgers_models.User = Depends(get_current_user), db: Session = Depends(get_db)):
+    if current_user.user_id != id:
+        raise HTTPException(
+            status_code=status.HTTP_401_UNAUTHORIZED,
+            detail="User not authorized"
+        )
+    return user_service.get_user_favourites(id, db)
+    
+
 # --------------------------------------------------------------------------------------------
-# - GET     /users/{id}/favourites
 # - DELETE  /users/{id}/favourites/{movieId}
 # - PATCH   /users/{id}/settings
 # - DELETE  /users/{id}

@@ -29,7 +29,7 @@ router = APIRouter(
     response_model=schemas.Token,
     description="Get access token",
     responses={
-        401: {"description": "Incorrect username or password"},
+        401: {"description": "Incorrect email or password"},
         200: {"description": "Token created"}
     }
 )
