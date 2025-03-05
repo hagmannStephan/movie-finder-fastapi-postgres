@@ -83,10 +83,33 @@ def get_user_favourites(id: int, current_user: postgers_models.User = Depends(ge
             detail="User not authorized"
         )
     return user_service.get_user_favourites(id, db)
-    
+
+
+@router.delete(
+        "/{id}/favourites/{movieId}",
+        response_model=schemas.Movie,
+        description="Remove a movie from the user's favourites",
+        responses={
+            200: {"description": "Movie removed"},
+            401: {"description": "User not authorized"},
+            404: {"description": "Movie not found"}
+        }
+)
+def remove_user_favourite(id: int, movieId: int, current_user: postgers_models.User = Depends(get_current_user), db: Session = Depends(get_db)):
+    if current_user.user_id != id:
+        raise HTTPException(
+            status_code=status.HTTP_401_UNAUTHORIZED,
+            detail="User not authorized"
+        )
+    try:
+        return user_service.remove_user_favourite(id, movieId, db)
+    except:
+        raise HTTPException(
+            status_code=status.HTTP_404_NOT_FOUND,
+            detail="Movie not found"
+        )
 
 # --------------------------------------------------------------------------------------------
-# - DELETE  /users/{id}/favourites/{movieId}
 # - PATCH   /users/{id}/settings
 # - DELETE  /users/{id}
 # - GET     /users/{id}/groups
