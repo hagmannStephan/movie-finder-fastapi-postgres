@@ -112,7 +112,7 @@ def remove_user_favourite(id: int, movieId: int, current_user: postgers_models.U
 
 @router.patch(
         "/{id}/settings",
-        response_model=schemas.User,
+        response_model=schemas.UserPatchSettings,
         description="Update user settings",
         responses={
             200: {"description": "Settings updated"},
