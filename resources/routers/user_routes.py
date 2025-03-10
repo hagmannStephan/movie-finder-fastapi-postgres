@@ -127,8 +127,38 @@ def update_user_settings(id: int, settings: schemas.UserPatchSettings, current_u
         )
     return user_service.update_user_settings(id, settings, db)
 
-# --------------------------------------------------------------------------------------------
-# - PATCH   /users/{id}/settings
-# - DELETE  /users/{id}
-# - GET     /users/{id}/groups
-# --------------------------------------------------------------------------------------------
+
+@router.delete(
+        "/{id}",
+        response_model=schemas.User,
+        description="Delete a user",
+        responses={
+            200: {"description": "User deleted"},
+            401: {"description": "User not authorized"}
+        }
+)
+def delete_user(id: int, current_user: postgers_models.User = Depends(get_current_user), db: Session = Depends(get_db)):
+    if current_user.user_id != id:
+        raise HTTPException(
+            status_code=status.HTTP_401_UNAUTHORIZED,
+            detail="User not authorized"
+        )
+    return user_service.delete_user(id, db)
+
+
+@router.get(
+        "/{id}/groups",
+        response_model=list[schemas.Group],
+        description="Get groups of a user",
+        responses={
+            200: {"description": "Groups found"},
+            401: {"description": "User not authorized"}
+        }
+)
+def get_user_groups(id: int, current_user: postgers_models.User = Depends(get_current_user), db: Session = Depends(get_db)):
+    if current_user.user_id != id:
+        raise HTTPException(
+            status_code=status.HTTP_401_UNAUTHORIZED,
+            detail="User not authorized"
+        )
+    return user_service.get_user_groups(id, db)

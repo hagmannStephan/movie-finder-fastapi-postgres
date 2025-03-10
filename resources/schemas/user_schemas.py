@@ -26,9 +26,9 @@ class User(UserCreated):
     release_date_lte: Optional[date] = None
     watch_region: str = 'CH'
 
-    watch_providers: List[str] = []
-    with_genres: List[str] = []
-    without_genres: List[str] = []
+    watch_providers: List[str] = Field(default_factory=list)
+    with_genres: List[str] = Field(default_factory=list)
+    without_genres: List[str] = Field(default_factory=list)
 
     created_on: Optional[datetime] = None
     last_login: Optional[datetime] = None
@@ -46,6 +46,8 @@ class User(UserCreated):
         if isinstance(value, str):
             import json
             return json.loads(value)
+        if isinstance(value, list):
+            return [str(item) for item in value]
         return value
     
     @field_validator("show_movies", "show_tv")

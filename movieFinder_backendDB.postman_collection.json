@@ -62,7 +62,7 @@
 				"header": [],
 				"body": {
 					"mode": "raw",
-					"raw": "{\r\n    \"name\": \"Stephan\",\r\n    \"email\": \"stephan@hagmann.com\",\r\n    \"password\": \"password123!\"\r\n}",
+					"raw": "{\r\n    \"name\": \"{{$NAME}}\",\r\n    \"email\": \"{{$EMAIL}}\",\r\n    \"password\": \"{{$PASSWORD}}\"\r\n}",
 					"options": {
 						"raw": {
 							"language": "json"
@@ -84,7 +84,7 @@
 			"response": []
 		},
 		{
-			"name": "/auth/token",
+			"name": "/auth/token/",
 			"event": [
 				{
 					"listen": "test",
@@ -110,25 +110,26 @@
 					"formdata": [
 						{
 							"key": "email",
-							"value": "stephan@hagmann.com",
+							"value": "{{$EMAIL}}",
 							"type": "text"
 						},
 						{
 							"key": "password",
-							"value": "password123!",
+							"value": "{{$PASSWORD}}",
 							"type": "text"
 						}
 					]
 				},
 				"url": {
-					"raw": "http://{{$BASE_URL}}/auth/token",
+					"raw": "http://{{$BASE_URL}}/auth/token/",
 					"protocol": "http",
 					"host": [
 						"{{$BASE_URL}}"
 					],
 					"path": [
 						"auth",
-						"token"
+						"token",
+						""
 					]
 				}
 			},
@@ -176,6 +177,250 @@
 						"auth",
 						"token",
 						"refresh"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "/users/me",
+			"event": [
+				{
+					"listen": "test",
+					"script": {
+						"exec": [
+							"pm.test(\"Status code is 200\", function () {\r",
+							"    pm.response.to.have.status(200);\r",
+							"});"
+						],
+						"type": "text/javascript",
+						"packages": {}
+					}
+				}
+			],
+			"request": {
+				"auth": {
+					"type": "bearer",
+					"bearer": [
+						{
+							"key": "token",
+							"value": "{{$ACCESS_TOKEN}}",
+							"type": "string"
+						}
+					]
+				},
+				"method": "GET",
+				"header": [],
+				"url": {
+					"raw": "http://{{$BASE_URL}}/users/me",
+					"protocol": "http",
+					"host": [
+						"{{$BASE_URL}}"
+					],
+					"path": [
+						"users",
+						"me"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "/users/{{$USER_ID}}/favourites",
+			"event": [
+				{
+					"listen": "test",
+					"script": {
+						"exec": [
+							"pm.test(\"Status code is 200\", function () {\r",
+							"    pm.response.to.have.status(200);\r",
+							"});"
+						],
+						"type": "text/javascript",
+						"packages": {}
+					}
+				}
+			],
+			"request": {
+				"auth": {
+					"type": "bearer",
+					"bearer": [
+						{
+							"key": "token",
+							"value": "{{$ACCESS_TOKEN}}",
+							"type": "string"
+						}
+					]
+				},
+				"method": "GET",
+				"header": [],
+				"url": {
+					"raw": "http://{{$BASE_URL}}/users/{{$USER_ID}}/favourites",
+					"protocol": "http",
+					"host": [
+						"{{$BASE_URL}}"
+					],
+					"path": [
+						"users",
+						"{{$USER_ID}}",
+						"favourites"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "/users/{{$USER_ID}}/favourites",
+			"event": [
+				{
+					"listen": "test",
+					"script": {
+						"exec": [
+							"pm.test(\"Status code is 200\", function () {\r",
+							"    pm.response.to.have.status(200);\r",
+							"});"
+						],
+						"type": "text/javascript",
+						"packages": {}
+					}
+				}
+			],
+			"request": {
+				"auth": {
+					"type": "bearer",
+					"bearer": [
+						{
+							"key": "token",
+							"value": "{{$ACCESS_TOKEN}}",
+							"type": "string"
+						}
+					]
+				},
+				"method": "DELETE",
+				"header": [],
+				"url": {
+					"raw": "http://{{$BASE_URL}}/users/{{$USER_ID}}/favourites/{{$MOVIE_ID}}",
+					"protocol": "http",
+					"host": [
+						"{{$BASE_URL}}"
+					],
+					"path": [
+						"users",
+						"{{$USER_ID}}",
+						"favourites",
+						"{{$MOVIE_ID}}"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "/users/{{$USER_ID}}/settings",
+			"request": {
+				"auth": {
+					"type": "bearer",
+					"bearer": [
+						{
+							"key": "token",
+							"value": "{{$ACCESS_TOKEN}}",
+							"type": "string"
+						}
+					]
+				},
+				"method": "PATCH",
+				"header": [],
+				"body": {
+					"mode": "raw",
+					"raw": "{\r\n    \"show_movies\": \"True\",\r\n    \"show_tv\": \"True\",\r\n    \"include_adult\": \"False\",\r\n    \"language\": \"de-CH\",\r\n    \"watch_region\": \"DE\",\r\n    \"release_date_gte\": \"2024-02-02\",\r\n    \"release_date_lte\": \"2024-02-05\",\r\n    \"watch_providers\": [\r\n        \"netflix\", \"disneyplus\"\r\n    ],\r\n    \"with_genres\": [\r\n        \"action\"\r\n    ],\r\n    \"without_genres\": [\r\n        \"horror\"\r\n    ]\r\n}",
+					"options": {
+						"raw": {
+							"language": "json"
+						}
+					}
+				},
+				"url": {
+					"raw": "http://{{$BASE_URL}}/users/{{$USER_ID}}/settings",
+					"protocol": "http",
+					"host": [
+						"{{$BASE_URL}}"
+					],
+					"path": [
+						"users",
+						"{{$USER_ID}}",
+						"settings"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "/users/{$USER_ID}",
+			"event": [
+				{
+					"listen": "test",
+					"script": {
+						"exec": [
+							"pm.test(\"Status code is 200\", function () {\r",
+							"    pm.response.to.have.status(200);\r",
+							"});"
+						],
+						"type": "text/javascript",
+						"packages": {}
+					}
+				}
+			],
+			"request": {
+				"auth": {
+					"type": "bearer",
+					"bearer": [
+						{
+							"key": "token",
+							"value": "{{$ACCESS_TOKEN}}",
+							"type": "string"
+						}
+					]
+				},
+				"method": "DELETE",
+				"header": [],
+				"url": {
+					"raw": "http://{{$BASE_URL}}/users/{{$USER_ID}}",
+					"protocol": "http",
+					"host": [
+						"{{$BASE_URL}}"
+					],
+					"path": [
+						"users",
+						"{{$USER_ID}}"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "/users/{{$USER_ID}}/groups",
+			"request": {
+				"auth": {
+					"type": "bearer",
+					"bearer": [
+						{
+							"key": "token",
+							"value": "{{$ACCESS_TOKEN}}",
+							"type": "string"
+						}
+					]
+				},
+				"method": "GET",
+				"header": [],
+				"url": {
+					"raw": "http://{{$BASE_URL}}/users/{{$USER_ID}}/groups",
+					"protocol": "http",
+					"host": [
+						"{{$BASE_URL}}"
+					],
+					"path": [
+						"users",
+						"{{$USER_ID}}",
+						"groups"
 					]
 				}
 			},
