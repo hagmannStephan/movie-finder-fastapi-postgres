@@ -10,7 +10,6 @@ services:
       - .env
     depends_on:
       - postgres
-      - redis
     networks:
       - dev-network
     ports:
@@ -28,18 +27,8 @@ services:
     ports:
       - "127.0.0.1:5432:5432"   # Ensure that it matches the port in the .env file
 
-  redis:
-    image: redis:7
-    restart: unless-stopped
-    volumes:
-      - redis-data:/data
-    networks:
-      - dev-network
-    ports:
-      - "127.0.0.1:6379:6379"  # Ensure that it matches the port in the .env file
 networks:
   dev-network:
 
 volumes:
   postgres-data:
-  redis-data:

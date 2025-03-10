@@ -1,0 +1,430 @@
+{
+	"info": {
+		"_postman_id": "60382448-66cc-416f-8bd0-9e2500be3845",
+		"name": "movieFinder_backendDB",
+		"schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json",
+		"_exporter_id": "31757397"
+	},
+	"item": [
+		{
+			"name": "/",
+			"event": [
+				{
+					"listen": "test",
+					"script": {
+						"exec": [
+							"pm.test(\"Status code is 200\", function () {\r",
+							"    pm.response.to.have.status(200);\r",
+							"});"
+						],
+						"type": "text/javascript",
+						"packages": {}
+					}
+				}
+			],
+			"request": {
+				"method": "GET",
+				"header": [],
+				"url": {
+					"raw": "http://{{$BASE_URL}}/",
+					"protocol": "http",
+					"host": [
+						"{{$BASE_URL}}"
+					],
+					"path": [
+						""
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "/users/",
+			"event": [
+				{
+					"listen": "test",
+					"script": {
+						"exec": [
+							"pm.test(\"Status code is 200\", function () {\r",
+							"    pm.response.to.have.status(200);\r",
+							"});"
+						],
+						"type": "text/javascript",
+						"packages": {}
+					}
+				}
+			],
+			"request": {
+				"auth": {
+					"type": "noauth"
+				},
+				"method": "POST",
+				"header": [],
+				"body": {
+					"mode": "raw",
+					"raw": "{\r\n    \"name\": \"{{$NAME}}\",\r\n    \"email\": \"{{$EMAIL}}\",\r\n    \"password\": \"{{$PASSWORD}}\"\r\n}",
+					"options": {
+						"raw": {
+							"language": "json"
+						}
+					}
+				},
+				"url": {
+					"raw": "http://{{$BASE_URL}}/users/",
+					"protocol": "http",
+					"host": [
+						"{{$BASE_URL}}"
+					],
+					"path": [
+						"users",
+						""
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "/auth/token/",
+			"event": [
+				{
+					"listen": "test",
+					"script": {
+						"exec": [
+							"pm.test(\"Status code is 200\", function () {\r",
+							"    pm.response.to.have.status(200);\r",
+							"});"
+						],
+						"type": "text/javascript",
+						"packages": {}
+					}
+				}
+			],
+			"request": {
+				"auth": {
+					"type": "noauth"
+				},
+				"method": "POST",
+				"header": [],
+				"body": {
+					"mode": "formdata",
+					"formdata": [
+						{
+							"key": "email",
+							"value": "{{$EMAIL}}",
+							"type": "text"
+						},
+						{
+							"key": "password",
+							"value": "{{$PASSWORD}}",
+							"type": "text"
+						}
+					]
+				},
+				"url": {
+					"raw": "http://{{$BASE_URL}}/auth/token/",
+					"protocol": "http",
+					"host": [
+						"{{$BASE_URL}}"
+					],
+					"path": [
+						"auth",
+						"token",
+						""
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "/auth/token/refresh",
+			"event": [
+				{
+					"listen": "test",
+					"script": {
+						"exec": [
+							"pm.test(\"Status code is 200\", function () {\r",
+							"    pm.response.to.have.status(200);\r",
+							"});"
+						],
+						"type": "text/javascript",
+						"packages": {}
+					}
+				}
+			],
+			"request": {
+				"auth": {
+					"type": "noauth"
+				},
+				"method": "POST",
+				"header": [],
+				"body": {
+					"mode": "urlencoded",
+					"urlencoded": [
+						{
+							"key": "refresh_token",
+							"value": "{{$REFRESH_TOKEN}}",
+							"type": "text"
+						}
+					]
+				},
+				"url": {
+					"raw": "http://{{$BASE_URL}}/auth/token/refresh",
+					"protocol": "http",
+					"host": [
+						"{{$BASE_URL}}"
+					],
+					"path": [
+						"auth",
+						"token",
+						"refresh"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "/users/me",
+			"event": [
+				{
+					"listen": "test",
+					"script": {
+						"exec": [
+							"pm.test(\"Status code is 200\", function () {\r",
+							"    pm.response.to.have.status(200);\r",
+							"});"
+						],
+						"type": "text/javascript",
+						"packages": {}
+					}
+				}
+			],
+			"request": {
+				"auth": {
+					"type": "bearer",
+					"bearer": [
+						{
+							"key": "token",
+							"value": "{{$ACCESS_TOKEN}}",
+							"type": "string"
+						}
+					]
+				},
+				"method": "GET",
+				"header": [],
+				"url": {
+					"raw": "http://{{$BASE_URL}}/users/me",
+					"protocol": "http",
+					"host": [
+						"{{$BASE_URL}}"
+					],
+					"path": [
+						"users",
+						"me"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "/users/{{$USER_ID}}/favourites",
+			"event": [
+				{
+					"listen": "test",
+					"script": {
+						"exec": [
+							"pm.test(\"Status code is 200\", function () {\r",
+							"    pm.response.to.have.status(200);\r",
+							"});"
+						],
+						"type": "text/javascript",
+						"packages": {}
+					}
+				}
+			],
+			"request": {
+				"auth": {
+					"type": "bearer",
+					"bearer": [
+						{
+							"key": "token",
+							"value": "{{$ACCESS_TOKEN}}",
+							"type": "string"
+						}
+					]
+				},
+				"method": "GET",
+				"header": [],
+				"url": {
+					"raw": "http://{{$BASE_URL}}/users/{{$USER_ID}}/favourites",
+					"protocol": "http",
+					"host": [
+						"{{$BASE_URL}}"
+					],
+					"path": [
+						"users",
+						"{{$USER_ID}}",
+						"favourites"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "/users/{{$USER_ID}}/favourites",
+			"event": [
+				{
+					"listen": "test",
+					"script": {
+						"exec": [
+							"pm.test(\"Status code is 200\", function () {\r",
+							"    pm.response.to.have.status(200);\r",
+							"});"
+						],
+						"type": "text/javascript",
+						"packages": {}
+					}
+				}
+			],
+			"request": {
+				"auth": {
+					"type": "bearer",
+					"bearer": [
+						{
+							"key": "token",
+							"value": "{{$ACCESS_TOKEN}}",
+							"type": "string"
+						}
+					]
+				},
+				"method": "DELETE",
+				"header": [],
+				"url": {
+					"raw": "http://{{$BASE_URL}}/users/{{$USER_ID}}/favourites/{{$MOVIE_ID}}",
+					"protocol": "http",
+					"host": [
+						"{{$BASE_URL}}"
+					],
+					"path": [
+						"users",
+						"{{$USER_ID}}",
+						"favourites",
+						"{{$MOVIE_ID}}"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "/users/{{$USER_ID}}/settings",
+			"request": {
+				"auth": {
+					"type": "bearer",
+					"bearer": [
+						{
+							"key": "token",
+							"value": "{{$ACCESS_TOKEN}}",
+							"type": "string"
+						}
+					]
+				},
+				"method": "PATCH",
+				"header": [],
+				"body": {
+					"mode": "raw",
+					"raw": "{\r\n    \"show_movies\": \"True\",\r\n    \"show_tv\": \"True\",\r\n    \"include_adult\": \"False\",\r\n    \"language\": \"de-CH\",\r\n    \"watch_region\": \"DE\",\r\n    \"release_date_gte\": \"2024-02-02\",\r\n    \"release_date_lte\": \"2024-02-05\",\r\n    \"watch_providers\": [\r\n        \"netflix\", \"disneyplus\"\r\n    ],\r\n    \"with_genres\": [\r\n        \"action\"\r\n    ],\r\n    \"without_genres\": [\r\n        \"horror\"\r\n    ]\r\n}",
+					"options": {
+						"raw": {
+							"language": "json"
+						}
+					}
+				},
+				"url": {
+					"raw": "http://{{$BASE_URL}}/users/{{$USER_ID}}/settings",
+					"protocol": "http",
+					"host": [
+						"{{$BASE_URL}}"
+					],
+					"path": [
+						"users",
+						"{{$USER_ID}}",
+						"settings"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "/users/{$USER_ID}",
+			"event": [
+				{
+					"listen": "test",
+					"script": {
+						"exec": [
+							"pm.test(\"Status code is 200\", function () {\r",
+							"    pm.response.to.have.status(200);\r",
+							"});"
+						],
+						"type": "text/javascript",
+						"packages": {}
+					}
+				}
+			],
+			"request": {
+				"auth": {
+					"type": "bearer",
+					"bearer": [
+						{
+							"key": "token",
+							"value": "{{$ACCESS_TOKEN}}",
+							"type": "string"
+						}
+					]
+				},
+				"method": "DELETE",
+				"header": [],
+				"url": {
+					"raw": "http://{{$BASE_URL}}/users/{{$USER_ID}}",
+					"protocol": "http",
+					"host": [
+						"{{$BASE_URL}}"
+					],
+					"path": [
+						"users",
+						"{{$USER_ID}}"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "/users/{{$USER_ID}}/groups",
+			"request": {
+				"auth": {
+					"type": "bearer",
+					"bearer": [
+						{
+							"key": "token",
+							"value": "{{$ACCESS_TOKEN}}",
+							"type": "string"
+						}
+					]
+				},
+				"method": "GET",
+				"header": [],
+				"url": {
+					"raw": "http://{{$BASE_URL}}/users/{{$USER_ID}}/groups",
+					"protocol": "http",
+					"host": [
+						"{{$BASE_URL}}"
+					],
+					"path": [
+						"users",
+						"{{$USER_ID}}",
+						"groups"
+					]
+				}
+			},
+			"response": []
+		}
+	]
+}

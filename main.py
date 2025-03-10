@@ -6,7 +6,7 @@ import resources.routers as routers
  
 app = FastAPI(
     title="Movie Finder - Backend",
-    description="FastAPI backend with PostgreSQL and Redis",
+    description="MovieFinder Backend with FastAPi and PostgreSQL",
     version="0.1.0"
 )
 
@@ -18,6 +18,9 @@ app.include_router(routers.auth_router)
 
 # `movie`-Endpoints
 app.include_router(routers.movie_router)
+
+# `user`-Endpoints
+app.include_router(routers.user_router)
 
 @app.get("/", tags=["Root"])
 def read_root():

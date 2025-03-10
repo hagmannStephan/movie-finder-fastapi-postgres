@@ -25,9 +25,6 @@ POSTGRES_USER=""
 POSTGRES_PASSWORD=""
 POSTGRES_DB=""
 
-REDIS_HOST=""
-REDIS_PORT=""
-
 SECRET_KEY =""
 ACCESS_TOKEN_EXPIRE_MINUTES=""
 REFRESH_TOKEN_EXPIRE_DAYS=""
@@ -45,5 +42,5 @@ pip freeze > requirements.txt
 Checkout the API-Doc under this URL: [http://127.0.0.1:8000/docs](http://127.0.0.1:8000/docs)
 
 ### Import Hoppscotch-Collection
-The collection with the file-name `movieFinder_backendDB.json` can be imported into Hoppscotch. There are also tests configured to check if the endpoints are according as excpected.
-For everything to work properly you'll need to setup a personal environment with the secrets `access_token` and `refresh_token`.
+In the file `movieFinder_backendDB.postman_collection.json` at the project root you can find the export of the endpoints from postman.
+The endpoints are configured with tests. To run them properly you need to create an environment with the following variables: `$BASE_URL`, `$ACCESS_TOKEN` and `$REFRESH_TOKEN`

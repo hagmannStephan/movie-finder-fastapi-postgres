@@ -5,7 +5,6 @@ from datetime import datetime, timedelta, timezone
 from typing import Optional
 from jose import JWTError, jwt
 from dotenv import load_dotenv
-from resources.schemas import TokenData
 from passlib.context import CryptContext
 from fastapi.security import OAuth2PasswordBearer
 from sqlalchemy.orm import Session
@@ -59,6 +58,9 @@ def create_refresh_token(data: dict, expires_delta: Optional[timedelta] = None):
 def get_user_by_name(db: Session, name: str):
     return db.query(postgers_models.User).filter(postgers_models.User.name == name).first()
 
+def get_user_by_email(db: Session, email: str):
+    return db.query(postgers_models.User).filter(postgers_models.User.email == email).first()
+
 async def get_current_user(token: str = Depends(oauth2_scheme), db: Session = Depends(get_db)):
     credentials_exception = HTTPException(
         status_code=status.HTTP_401_UNAUTHORIZED,
@@ -67,14 +69,13 @@ async def get_current_user(token: str = Depends(oauth2_scheme), db: Session = De
     )
     try:
         payload = jwt.decode(token, SECRET_KEY, algorithms=[ALGORITHM])
-        username: str = payload.get("sub")      # Subject
+        email: str = payload.get("sub")      # Subject
         token_type: str = payload.get("type")
-        if username is None or token_type != "access":
+        if email is None or token_type != "access":
             raise credentials_exception
-        token_data = TokenData(username=username)
     except JWTError:
         raise credentials_exception
-    user = get_user_by_name(db, name=token_data.username)
+    user = get_user_by_email(db, email=email)
     if user is None:
         raise credentials_exception
     return user
