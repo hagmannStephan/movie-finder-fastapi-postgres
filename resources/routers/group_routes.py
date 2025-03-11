@@ -2,6 +2,8 @@ from fastapi import APIRouter, Depends
 import resources.schemas as schemas
 import resources.services.group_service  as group_service
 from resources.services.auth_service import get_current_user
+from resources.services.postgresql_service import get_db
+from sqlalchemy.orm import Session
 
 
 router = APIRouter(
@@ -17,8 +19,8 @@ router = APIRouter(
         "200": {"description": "Group created"},
     }
 )
-def create_group(group: schemas.GroupCreate, current_user: schemas.User = Depends(get_current_user)):
-    return group_service.create_group(group, current_user)
+def create_group(group: schemas.GroupCreate, current_user: schemas.User = Depends(get_current_user), db: Session = Depends(get_db)):
+    return group_service.create_group(group, current_user, db)
 
 # --------------------------------------------------------------------------------------------
 # TODO: Implement these endpoints

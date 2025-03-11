@@ -18,5 +18,18 @@ def delete_group(
     db.commit()
     return group
 
-def create_group():
-    pass
+def create_group(
+        group: schemas.GroupCreate,
+        current_user: schemas.User,
+        db: Session = Depends(get_db)
+) -> schemas.Group:
+    db_group = postgers_models.Group(
+        name=group.name,
+        admin_id=current_user.user_id
+    )
+
+    db.add(db_group)
+    db.commit()
+    db.refresh(db_group)
+
+    return db_group

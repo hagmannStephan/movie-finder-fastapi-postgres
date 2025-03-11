@@ -4,11 +4,11 @@ from datetime import date
 
 class GroupCreate(BaseModel):
     name: str = Field(..., max_length=25)
-    admin_id: int
 
 class Group(GroupCreate):
     group_id: int
     created_on: date = Field(default='now()')
+    admin_id: int
 
     show_movies: bool = True
     show_tv: bool = True
