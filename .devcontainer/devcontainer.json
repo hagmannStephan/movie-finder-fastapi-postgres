@@ -4,19 +4,13 @@
 	"name": "MovieFinder Backend: Python 3 with PostgreSQL",
 	"dockerComposeFile": "../docker-compose.yml",
 	"service": "app",
-	"workspaceFolder": "/workspace",
+	"workspaceFolder": "/app",
 
 	// Features to add to the dev container. More info: https://containers.dev/features.
 	// "features": {},
 
 	// Use 'forwardPorts' to make a list of ports inside the container available locally.
 	"forwardPorts": [8000],		// Ensure that it matches with ports in .env and docker-compose.yaml
-
-	// Use 'postCreateCommand' to run commands after the container is created.
-	"postCreateCommand": "[ -f requirements.txt ] && pip install -r requirements.txt || echo 'No requirements.txt found'",
-
-	// Specify the command to run every time the container starts
-	"postStartCommand": "uvicorn main:app --host 0.0.0.0 --port 8000 --reload",
 
 	// Configure tool-specific properties.
     "customizations": {
