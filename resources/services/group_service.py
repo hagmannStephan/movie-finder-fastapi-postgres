@@ -33,3 +33,24 @@ def create_group(
     db.refresh(db_group)
 
     return db_group
+
+def get_group(
+        id: int,
+        current_user: schemas.User,
+        db: Session = Depends(get_db)
+) -> schemas.GroupQuery:
+    group = db.query(postgers_models.Group).filter(postgers_models.Group.group_id == id).first()
+
+    members = db.query(postgers_models.group_users.c.user_id).filter(postgers_models.group_users.c.group_id == id).all()
+    member_ids = [member.user_id for member in members]
+
+    if not group:
+        raise Exception("Group not found")
+
+    if group.admin_id != current_user.user_id or current_user.user_id not in member_ids:
+        raise Exception("User not authorized")
+
+    return schemas.GroupQuery(
+        group=schemas.from_orm(group),
+        members=member_ids
+    )

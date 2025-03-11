@@ -22,3 +22,6 @@ class Group(GroupCreate):
     without_genres: Optional[List] = Field(default_factory=list)
 
     model_config = ConfigDict(from_attributes=True)
+
+class GroupQuery(GroupCreate):
+    members = List[int]
