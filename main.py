@@ -22,6 +22,9 @@ app.include_router(routers.movie_router)
 # `user`-Endpoints
 app.include_router(routers.user_router)
 
+# `group`-Endpoints
+app.include_router(routers.group_router)
+
 @app.get("/", tags=["Root"])
 def read_root():
     return {"Hello": "World"}

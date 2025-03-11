@@ -17,3 +17,6 @@ def delete_group(
     db.delete(group)
     db.commit()
     return group
+
+def create_group():
+    pass
