@@ -1,0 +1,49 @@
+name: Deploy MovieFinder Backend
+
+# Define when the workflow will run
+on:
+  push:
+    branches: [ main ]
+
+jobs:
+  # Define name of job
+  deploy:
+    # Define where the job runs
+    runs-on: ubuntu-latest
+    steps:
+      # Checkout code and make sure that it is available for the steps below
+      - name: Checkout code
+        uses: actions/checkout@v3
+      # Configure SSH-Authentication
+      - name: Set up SSH
+        uses: webfactory/ssh-agent@v0.7.0
+        with:
+          ssh-private-key: ${{ secrets.SSH_PRIVATE_KEY }}
+
+      # Add host to know host to avoid issues on conneciton
+      - name: Add server to known hosts
+        run: |
+          mkdir -p ~/.ssh
+          ssh-keyscan -H ${{ secrets.SERVER_IP }} >> ~/.ssh/known_hosts
+
+      # Create .env file on server from GitHub Secrets
+      - name: Create .env file on server
+        env:
+          SERVER_IP: ${{ secrets.SERVER_IP }}
+          SERVER_USER: ${{ secrets.SERVER_USER }}
+          SERVER_PATH: ${{ secrets.SERVER_PATH }}
+          ENV_FILE_CONTENT: ${{ secrets.ENV_FILE_CONTENT }}
+        run: |
+          ssh $SERVER_USER@$SERVER_IP "cd $SERVER_PATH && echo '$ENV_FILE_CONTENT' > .env"
+
+      # Deploy to server
+      - name: Deploy to server
+        env:
+          SERVER_IP: ${{ secrets.SERVER_IP }}
+          SERVER_USER: ${{ secrets.SERVER_USER }}
+          SERVER_PATH: ${{ secrets.SERVER_PATH }}
+        run: |
+          ssh $SERVER_USER@$SERVER_IP "cd $SERVER_PATH && \
+          git pull origin main && \
+          docker-compose down && \
+          docker-compose up -d --build"
