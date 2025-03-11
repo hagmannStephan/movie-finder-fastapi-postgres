@@ -2,10 +2,11 @@ version: '3.8'
 
 services:
   app:
-    image: mcr.microsoft.com/devcontainers/python:1-3.12-bullseye
+    build:
+      context: .
+      dockerfile: docker/app/Dockerfile
     volumes:
-      - .:/workspace
-    command: sleep infinity   # Keep the container running 
+      - .:/app
     env_file:
       - .env
     depends_on:
@@ -13,10 +14,12 @@ services:
     networks:
       - dev-network
     ports:
-      - "8001:8000"
+      - "8000:8000"
 
   postgres:
-    image: postgres:14
+    build:
+      context: ./docker/postgres
+      dockerfile: Dockerfile
     restart: unless-stopped
     volumes:
       - postgres-data:/var/lib/postgresql/data
