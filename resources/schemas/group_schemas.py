@@ -2,12 +2,13 @@ from pydantic import BaseModel, Field, ConfigDict
 from typing import List, Optional
 from datetime import date
 
-class Group(BaseModel):
-    group_id: int
+class GroupCreate(BaseModel):
     name: str = Field(..., max_length=25)
-    password: str = Field(..., max_length=50)
     admin_id: int
-    created_on: date
+
+class Group(GroupCreate):
+    group_id: int
+    created_on: date = Field(default='now()')
 
     show_movies: bool = True
     show_tv: bool = True
