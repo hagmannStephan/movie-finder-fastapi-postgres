@@ -4,3 +4,4 @@ __pycache__/
 .git
 README.md
 .dockerignore
+movieFinder_backendDB.postman_collection.json

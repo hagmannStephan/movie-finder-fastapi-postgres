@@ -28,6 +28,7 @@ router = APIRouter(
 # POST     /movies/{id}/right-swipe             Right swipe a movie
 # POST     /movies/{id}/left-swipe              Left swipe a movie
 # GET      /movies/search?query={keywords}      Search for movie by keywords
+# Maybe also an endpoint that gets genres, etc. that may be relevant for the UI to know
 # --------------------------------------------------------------------------------------------
 
 @router.get("/")
