@@ -1,23 +1,8 @@
 # Movie Finder - Backend
+You can find the official API documentation, created with Swagger, under the following URL: [api.moviefinder.stephanhagmann.ch/docs](https://api.moviefinder.stephanhagmann.ch/docs)
 ## Development - Cheat Sheet
-### Run Dev-Server
-The project should start automatically once the dev container gets booted up, but if you want to start it manually:
-```shell
-fastapi dev main.py
-```
-
-### Run Prod-Server
-```shell
-fastapi run
-```
-### Download Requirements
-The requirements should get installed automatically if you start a dev-container, but just in case:
-
-```shell
-pip install -r requirements.txt
-```
-
-You also need to create a `.env` file at the project root. You'll have to set the following values:
+### Run the project
+After you cloned the repo, you need to create a `.env` file in the project root that contains the following values:
 ```.env
 POSTGRES_HOST=""
 POSTGRES_PORT=""
@@ -33,14 +18,32 @@ ALGORITHM=""
 TMDB_API_KEY=""
 ```
 
-### Freeze Requirements
+Since all dependencies get installed on startup of the container and the app also gets started up, you just need to run this command:
+```bash
+docker compose up
+```
+
+### Manage requirements
+If you want to download the requirements that got added since you created the container, you need to execute this command:
+```bash
+pip install -r requirements.txt
+```
+
+In case you installed new requirements, you need to run this command:
 ```shell
 pip freeze > requirements.txt
 ```
 
-### Access API-Doc
-Checkout the API-Doc under this URL: [http://127.0.0.1:8000/docs](http://127.0.0.1:8000/docs)
+### Use Postman Collection
+The [Postman Collection](movieFinder_backendDB.postman_collection.json) helps you test if all the endpoints work properly. There are integrated tests, to check if return codes, etc. match the expected value.
+To execute the requests in Postman, you need to create an Environment with the following values:
 
-### Import Hoppscotch-Collection
-In the file `movieFinder_backendDB.postman_collection.json` at the project root you can find the export of the endpoints from postman.
-The endpoints are configured with tests. To run them properly you need to create an environment with the following variables: `$BASE_URL`, `$ACCESS_TOKEN` and `$REFRESH_TOKEN`
+- `$BASE_URL` (probably 127.0.0.1:8000)
+- `$ACCESS_TOKEN` (you can set this once you gain your access token)
+- `$REFRESH_TOKEN` (you can set this once you gain your refresh token)
+- `$USER_ID` (you can set this once you created a user)
+- `$NAME` (you can choose this freely)
+- `$EMAIL` (you can choose this freely, but it needs to be unique in the DB)
+- `$PASSWORD` (you can choose this freely)
+- `$MOVIE_ID` (you can set this based on the action you want to perform)
+- `$GROUP_ID` (you can set this based on the action you want to perform)

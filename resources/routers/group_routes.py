@@ -1,4 +1,4 @@
-from fastapi import APIRouter, Depends
+from fastapi import APIRouter, Depends, HTTPException
 import resources.schemas as schemas
 import resources.services.group_service  as group_service
 from resources.services.auth_service import get_current_user
@@ -18,10 +18,15 @@ router = APIRouter(
     description="Create a new group",
     responses={
         "200": {"description": "Group created"},
+        "500": {"description": "Internal server error"}
     }
 )
 def create_group(group: schemas.GroupCreate, current_user: schemas.User = Depends(get_current_user), db: Session = Depends(get_db)):
-    return group_service.create_group(group, current_user, db)
+    try:
+        return group_service.create_group(group, current_user, db)
+    except Exception as e:
+        print(e)
+        raise HTTPException(status_code=500, detail="Internal server error")
 
 @router.get(
     "/{id}",
@@ -30,12 +35,22 @@ def create_group(group: schemas.GroupCreate, current_user: schemas.User = Depend
     responses={
         "200": {"description": "Group found"},
         "404": {"description": "Group not found"},
-        "401": {"description": "User not authorized"}
+        "401": {"description": "User not authorized"},
+        "500": {"description": "Internal server error"}
     }
 )
 def get_group(id: int, current_user: schemas.User = Depends(get_current_user), db: Session = Depends(get_db)):
-    # TODO: Act as expected on the different exceptions
-    return group_service.get_group(id, current_user, db)
+    try:
+        return group_service.get_group(id, current_user, db)
+    except Exception as e:
+        if str(e) == "Group not found":
+            raise HTTPException(status_code=404, detail="Group not found")
+        elif str(e) == "User not authorized":
+            raise HTTPException(status_code=401, detail="User not authorized")
+        else:
+            print(e)
+            raise HTTPException(status_code=500, detail="Internal server error")
+        
 
 # --------------------------------------------------------------------------------------------
 # TODO: Implement these endpoints

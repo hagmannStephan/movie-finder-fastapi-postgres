@@ -13,6 +13,10 @@ app = FastAPI(
 Base.metadata.create_all(bind=engine)
 
 
+@app.get("/", tags=["Root"])
+def read_root():
+    return {"Hello": "World"}
+
 # `auth`-Endpoints
 app.include_router(routers.auth_router)
 
@@ -24,7 +28,3 @@ app.include_router(routers.user_router)
 
 # `group`-Endpoints
 app.include_router(routers.group_router)
-
-@app.get("/", tags=["Root"])
-def read_root():
-    return {"Hello": "World"}

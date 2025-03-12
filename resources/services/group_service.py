@@ -51,6 +51,6 @@ def get_group(
         raise Exception("User not authorized")
 
     return schemas.GroupQuery(
-        group=schemas.from_orm(group),
+        **group.__dict__,
         members=member_ids
     )

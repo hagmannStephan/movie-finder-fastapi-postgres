@@ -17,8 +17,9 @@ router = APIRouter(
         response_model=schemas.UserCreated,
         description="Create a new user",
         responses={
-            200: {"description": "User created"},
-            400: {"description": "User with Email already exists"}
+            "200": {"description": "User created"},
+            "400": {"description": "User with Email already exists"},
+            "500": {"description": "Internal server error"}
         }
 )
 def create_user(user: schemas.UserCreate, db: Session = Depends(get_db)):
@@ -31,7 +32,7 @@ def create_user(user: schemas.UserCreate, db: Session = Depends(get_db)):
                 detail="Email already registered"
             )
         else:
-            raise e
+            raise HTTPException(status_code=status.HTTP_500_INTERNAL_SERVER_ERROR, detail="Internal server error")
 
 
 @router.get(
@@ -39,8 +40,8 @@ def create_user(user: schemas.UserCreate, db: Session = Depends(get_db)):
         response_model=schemas.User,
         description="Get current user",
         responses={
-            200: {"description": "User found"},
-            401: {"description": "User not authenticated"}
+            "200": {"description": "User found"},
+            "401": {"description": "User not authenticated"}
         }
 )
 def read_current_user(current_user: postgers_models.User = Depends(get_current_user)):
@@ -52,17 +53,22 @@ def read_current_user(current_user: postgers_models.User = Depends(get_current_u
         response_model=list[schemas.Movie],
         description="Get liked movies of a user",
         responses={
-            200: {"description": "User found"},
-            401: {"description": "User not authorized"}
+            "200": {"description": "User found"},
+            "401": {"description": "User not authorized"},
+            "500": {"description": "Internal server error"}
         }
 )
 def get_user_favourites(id: int, current_user: postgers_models.User = Depends(get_current_user), db: Session = Depends(get_db)):
-    if current_user.user_id != id:
-        raise HTTPException(
-            status_code=status.HTTP_401_UNAUTHORIZED,
-            detail="User not authorized"
-        )
-    return user_service.get_user_favourites(id, db)
+    try:
+        if current_user.user_id != id:
+            raise HTTPException(
+                status_code=status.HTTP_401_UNAUTHORIZED,
+                detail="User not authorized"
+            )
+        return user_service.get_user_favourites(id, db)
+    except Exception as e:
+        print(e)
+        raise HTTPException(status_code=status.HTTP_500_INTERNAL_SERVER_ERROR, detail="Internal server error")
 
 
 @router.delete(
@@ -70,24 +76,29 @@ def get_user_favourites(id: int, current_user: postgers_models.User = Depends(ge
         response_model=schemas.Movie,
         description="Remove a movie from the user's favourites",
         responses={
-            200: {"description": "Movie removed"},
-            401: {"description": "User not authorized"},
-            404: {"description": "Movie not found"}
+            "200": {"description": "Movie removed"},
+            "401": {"description": "User not authorized"},
+            "404": {"description": "Movie not found"},
+            "500": {"description": "Internal server error"}
         }
 )
 def remove_user_favourite(id: int, movieId: int, current_user: postgers_models.User = Depends(get_current_user), db: Session = Depends(get_db)):
-    if current_user.user_id != id:
-        raise HTTPException(
-            status_code=status.HTTP_401_UNAUTHORIZED,
-            detail="User not authorized"
-        )
     try:
-        return user_service.remove_user_favourite(id, movieId, db)
-    except:
-        raise HTTPException(
-            status_code=status.HTTP_404_NOT_FOUND,
-            detail="Movie not found"
-        )
+        if current_user.user_id != id:
+            raise HTTPException(
+                status_code=status.HTTP_401_UNAUTHORIZED,
+                detail="User not authorized"
+            )
+        try:
+            return user_service.remove_user_favourite(id, movieId, db)
+        except:
+            raise HTTPException(
+                status_code=status.HTTP_404_NOT_FOUND,
+                detail="Movie not found"
+            )
+    except Exception as e:
+        print(e)
+        raise HTTPException(status_code=status.HTTP_500_INTERNAL_SERVER_ERROR, detail="Internal server error")
     
 
 @router.patch(
@@ -95,17 +106,22 @@ def remove_user_favourite(id: int, movieId: int, current_user: postgers_models.U
         response_model=schemas.UserPatchSettings,
         description="Update user settings",
         responses={
-            200: {"description": "Settings updated"},
-            401: {"description": "User not authorized"}
+            "200": {"description": "Settings updated"},
+            "401": {"description": "User not authorized"},
+            "500": {"description": "Internal server error"}
         }
 )
 def update_user_settings(id: int, settings: schemas.UserPatchSettings, current_user: postgers_models.User = Depends(get_current_user), db: Session = Depends(get_db)):
-    if current_user.user_id != id:
-        raise HTTPException(
-            status_code=status.HTTP_401_UNAUTHORIZED,
-            detail="User not authorized"
-        )
-    return user_service.update_user_settings(id, settings, db)
+    try:
+        if current_user.user_id != id:
+            raise HTTPException(
+                status_code=status.HTTP_401_UNAUTHORIZED,
+                detail="User not authorized"
+            )
+        return user_service.update_user_settings(id, settings, db)
+    except Exception as e:
+        print(e)
+        raise
 
 
 @router.delete(
@@ -113,17 +129,22 @@ def update_user_settings(id: int, settings: schemas.UserPatchSettings, current_u
         response_model=schemas.User,
         description="Delete a user",
         responses={
-            200: {"description": "User deleted"},
-            401: {"description": "User not authorized"}
+            "200": {"description": "User deleted"},
+            "401": {"description": "User not authorized"},
+            "500": {"description": "Internal server error"}
         }
 )
 def delete_user(id: int, current_user: postgers_models.User = Depends(get_current_user), db: Session = Depends(get_db)):
-    if current_user.user_id != id:
-        raise HTTPException(
-            status_code=status.HTTP_401_UNAUTHORIZED,
-            detail="User not authorized"
-        )
-    return user_service.delete_user(id, db)
+    try:
+        if current_user.user_id != id:
+            raise HTTPException(
+                status_code=status.HTTP_401_UNAUTHORIZED,
+                detail="User not authorized"
+            )
+        return user_service.delete_user(id, db)
+    except Exception as e:
+        print(e)
+        raise HTTPException(status_code=status.HTTP_500_INTERNAL_SERVER_ERROR, detail="Internal server error")
 
 
 @router.get(
@@ -131,14 +152,19 @@ def delete_user(id: int, current_user: postgers_models.User = Depends(get_curren
         response_model=list[schemas.Group],
         description="Get groups of a user",
         responses={
-            200: {"description": "Groups found"},
-            401: {"description": "User not authorized"}
+            "200": {"description": "Groups found"},
+            "401": {"description": "User not authorized"},
+            "500": {"description": "Internal server error"}
         }
 )
 def get_user_groups(id: int, current_user: postgers_models.User = Depends(get_current_user), db: Session = Depends(get_db)):
-    if current_user.user_id != id:
-        raise HTTPException(
-            status_code=status.HTTP_401_UNAUTHORIZED,
-            detail="User not authorized"
-        )
-    return user_service.get_user_groups(id, db)
+    try:
+        if current_user.user_id != id:
+            raise HTTPException(
+                status_code=status.HTTP_401_UNAUTHORIZED,
+                detail="User not authorized"
+            )
+        return user_service.get_user_groups(id, db)
+    except Exception as e:
+        print(e)
+        raise HTTPException(status_code=status.HTTP_500_INTERNAL_SERVER_ERROR, detail="Internal server error")
