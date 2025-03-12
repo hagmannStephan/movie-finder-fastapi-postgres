@@ -39,10 +39,10 @@ The [Postman Collection](movieFinder_backendDB.postman_collection.json) helps yo
 To execute the requests in Postman, you need to create an Environment with the following values:
 
 - `$BASE_URL` (probably 127.0.0.1:8000)
-- `$ACCESS_TOKEN` (you can set this once you gained your acces token)
-- `$REFRESH_TOKEN` (you can set this, once you gained your refresh token)
+- `$ACCESS_TOKEN` (you can set this once you gain your access token)
+- `$REFRESH_TOKEN` (you can set this once you gain your refresh token)
 - `$USER_ID` (you can set this once you created a user)
-- `$NAME` (you can chose this freely)
-- `$EMAIL` (you can chose this freely, but it need to be unique in the DB)
-- `$PASSWORD` (you chan chose this freely)
+- `$NAME` (you can choose this freely)
+- `$EMAIL` (you can choose this freely, but it needs to be unique in the DB)
+- `$PASSWORD` (you can choose this freely)
 - `$MOVIE_ID` (you can set this based on the action you want to perform)
