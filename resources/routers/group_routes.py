@@ -146,8 +146,25 @@ def delete_group(id: int, current_user: schemas.User = Depends(get_current_user)
             print(e)
             raise HTTPException(status_code=500, detail="Internal server error")
         
-# --------------------------------------------------------------------------------------------
-# TODO: Implement these endpoints
-# --------------------------------------------------------------------------------------------
-# GET       /groups/{id}/matches        Get matches of a group
-# --------------------------------------------------------------------------------------------
+@router.get(
+    '/{id}/matches',
+    response_model=schemas.GroupMatchQuery,
+    description="Get matches of a group (and close matches)",
+    responses={
+        "200": {"description": "Matches found"},
+        "404": {"description": "Group not found"},
+        "401": {"description": "User not authorized"},
+        "500": {"description": "Internal server error"}
+    }
+)
+def get_group_matches(id: int, current_user: schemas.User = Depends(get_current_user), db: Session = Depends(get_db)):
+    try:
+        return group_service.get_group_matches(id, current_user, db)
+    except Exception as e:
+        if str(e) == "Group not found":
+            raise HTTPException(status_code=404, detail="Group not found")
+        elif str(e) == "User not authorized":
+            raise HTTPException(status_code=401, detail="User not authorized")
+        else:
+            print(e)
+            raise HTTPException(status_code=500, detail="Internal server error")
