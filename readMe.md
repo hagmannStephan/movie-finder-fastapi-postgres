@@ -5,8 +5,8 @@ You can find the official API documentation, created with Swagger, under the fol
 After you cloned the repo, you need to create a `.env` file in the project root that contains the following values:
 ```.env
 POSTGRES_HOST=""
-POSTGRES_PORT=""
-POSTGRES_USER=""
+POSTGRES_PORT="5432"
+POSTGRES_USER="postgres-backend"
 POSTGRES_PASSWORD=""
 POSTGRES_DB=""
 

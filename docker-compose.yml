@@ -10,7 +10,8 @@ services:
     env_file:
       - .env
     depends_on:
-      - postgres
+      postgres:
+        condition: service_healthy
     networks:
       - dev-network
     ports:
@@ -29,6 +30,11 @@ services:
       - dev-network
     ports:
       - "127.0.0.1:5432:5432"   # Ensure that it matches the port in the .env file
+    healthcheck:
+      test: ["CMD", "pg_isready", "-U", "postgres-backend"]   # Ensure that it matches the user in the .env file
+      interval: 10s
+      timeout: 5s
+      retries: 5
 
 networks:
   dev-network:
