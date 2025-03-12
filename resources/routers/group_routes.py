@@ -97,7 +97,31 @@ def add_group_member(id: int, member: schemas.GroupMember, current_user: schemas
             print(e)
             raise HTTPException(status_code=500, detail="Internal server error")
 
-
+@router.delete(
+    '/{id}/members/{member_id}',
+    response_model=schemas.GroupQuery,
+    description="Remove a member from a group (or leave the group)",
+    responses={
+        "200": {"description": "Member removed"},
+        "404": {"description": "Group not found"},
+        "404": {"description": "Member not found"},
+        "401": {"description": "User not authorized"},
+        "500": {"description": "Internal server error"}
+    }
+)
+def remove_group_member(id: int, member_id: int, current_user: schemas.User = Depends(get_current_user), db: Session = Depends(get_db)):
+    try:
+        return group_service.remove_group_member(id, member_id, current_user, db)
+    except Exception as e:
+        if str(e) == "Group not found":
+            raise HTTPException(status_code=404, detail="Group not found")
+        elif str(e) == "Member not found":
+            raise HTTPException(status_code=404, detail="Member not found")
+        elif str(e) == "User not authorized":
+            raise HTTPException(status_code=401, detail="User not authorized")
+        else:
+            print(e)
+            raise HTTPException(status_code=500, detail="Internal server error")
         
 # --------------------------------------------------------------------------------------------
 # TODO: Implement these endpoints
