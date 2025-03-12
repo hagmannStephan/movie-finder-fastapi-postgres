@@ -4,7 +4,7 @@ from resources.services.postgresql_service import get_db
 import resources.models.postgres as postgers_models
 import resources.schemas as schemas
 
-def delete_group(
+def delete_group_helper(
         id: int,
         db: Session = Depends(get_db)
 ) -> schemas.Group:
@@ -130,3 +130,18 @@ def remove_group_member(
         db.commit()
 
         return get_group(id, current_user, db)
+
+def delete_group(
+        id: int,
+        current_user: schemas.User,
+        db: Session = Depends(get_db)
+) -> schemas.Group:
+    group = db.query(postgers_models.Group).filter(postgers_models.Group.group_id == id).first()
+
+    if not group:
+        raise Exception("Group not found")
+
+    if group.admin_id != current_user.user_id:
+        raise Exception("User not authorized")
+
+    return delete_group_helper(id, db)

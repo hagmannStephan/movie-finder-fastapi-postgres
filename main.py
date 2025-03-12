@@ -20,11 +20,11 @@ def read_root():
 # `auth`-Endpoints
 app.include_router(routers.auth_router)
 
-# `movie`-Endpoints
-app.include_router(routers.movie_router)
-
 # `user`-Endpoints
 app.include_router(routers.user_router)
 
 # `group`-Endpoints
 app.include_router(routers.group_router)
+
+# `movie`-Endpoints
+app.include_router(routers.movie_router)

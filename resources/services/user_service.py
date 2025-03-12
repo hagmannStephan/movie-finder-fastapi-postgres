@@ -102,7 +102,7 @@ def delete_user(
         ).count()
 
         if member_count <= 1:
-            group_service.delete_group(group.group_id, db)
+            group_service.delete_group_helper(group.group_id, db)
         else:
             new_admin = db.query(postgers_models.group_users.c.user_id).filter(
                 postgers_models.group_users.c.group_id == group.group_id,
