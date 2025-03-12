@@ -1,6 +1,6 @@
 {
 	"info": {
-		"_postman_id": "60382448-66cc-416f-8bd0-9e2500be3845",
+		"_postman_id": "29cfa2f6-3758-43f0-aca2-a94ba2610abf",
 		"name": "movieFinder_backendDB",
 		"schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json",
 		"_exporter_id": "31757397"
@@ -618,6 +618,124 @@
 								"groups",
 								"{{$GROUP_ID}}",
 								"members"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "/{{$GROUP_ID}}/members/{{$MEMBER_ID}}",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"exec": [
+									"pm.test(\"Status code is 200\", function () {\r",
+									"    pm.response.to.have.status(200);\r",
+									"});"
+								],
+								"type": "text/javascript",
+								"packages": {}
+							}
+						}
+					],
+					"request": {
+						"auth": {
+							"type": "bearer",
+							"bearer": [
+								{
+									"key": "token",
+									"value": "{{$ACCESS_TOKEN}}",
+									"type": "string"
+								}
+							]
+						},
+						"method": "DELETE",
+						"header": [],
+						"url": {
+							"raw": "http://{{$BASE_URL}}/groups/{{$GROUP_ID}}/members/{{$MEMBER_ID}}",
+							"protocol": "http",
+							"host": [
+								"{{$BASE_URL}}"
+							],
+							"path": [
+								"groups",
+								"{{$GROUP_ID}}",
+								"members",
+								"{{$MEMBER_ID}}"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "/{{$GROUP_ID}}",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"exec": [
+									"pm.test(\"Status code is 200\", function () {\r",
+									"    pm.response.to.have.status(200);\r",
+									"});"
+								],
+								"type": "text/javascript",
+								"packages": {}
+							}
+						}
+					],
+					"request": {
+						"auth": {
+							"type": "bearer",
+							"bearer": [
+								{
+									"key": "token",
+									"value": "{{$ACCESS_TOKEN}}",
+									"type": "string"
+								}
+							]
+						},
+						"method": "DELETE",
+						"header": [],
+						"url": {
+							"raw": "http://{{$BASE_URL}}/groups/{{$GROUP_ID}}",
+							"protocol": "http",
+							"host": [
+								"{{$BASE_URL}}"
+							],
+							"path": [
+								"groups",
+								"{{$GROUP_ID}}"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "/{{$GROUP_ID}}/matches",
+					"request": {
+						"auth": {
+							"type": "bearer",
+							"bearer": [
+								{
+									"key": "token",
+									"value": "{{$ACCESS_TOKEN}}",
+									"type": "string"
+								}
+							]
+						},
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "http://{{$BASE_URL}}/groups/{{$GROUP_ID}}/matches",
+							"protocol": "http",
+							"host": [
+								"{{$BASE_URL}}"
+							],
+							"path": [
+								"groups",
+								"{{$GROUP_ID}}",
+								"matches"
 							]
 						}
 					},
