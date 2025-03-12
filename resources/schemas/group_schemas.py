@@ -24,4 +24,4 @@ class Group(GroupCreate):
     model_config = ConfigDict(from_attributes=True)
 
 class GroupQuery(GroupCreate):
-    members = List[int]
+    members: List[int]
