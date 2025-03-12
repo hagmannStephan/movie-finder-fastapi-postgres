@@ -54,3 +54,50 @@ def get_group(
         **group.__dict__,
         members=member_ids
     )
+
+def update_group(
+        id: int,
+        original_group: schemas.Group,
+        current_user: schemas.User,
+        db: Session = Depends(get_db)
+) -> schemas.Group:
+    group = db.query(postgers_models.Group).filter(postgers_models.Group.group_id == id).first()
+
+    if not group:
+        raise Exception("Group not found")
+    
+    if (group.admin_id != original_group.admin_id and current_user.user_id != original_group.admin_id 
+        or original_group.group_id != group.group_id
+        or original_group.created_on != group.created_on):
+        raise Exception("User not authorized")
+    
+    for key, value in original_group.dict().items():
+        setattr(group, key, value)
+    db.commit()
+    return group
+
+def add_group_member(
+        id: int,
+        member: schemas.GroupMember,
+        current_user: schemas.User,
+        db: Session = Depends(get_db)
+) -> schemas.GroupQuery:
+    group = db.query(postgers_models.Group).filter(postgers_models.Group.group_id == id).first()
+    user = db.query(postgers_models.User).filter(postgers_models.User.friend_code == member.friend_code).first()
+
+    if not group:
+        raise Exception("Group not found")
+
+    if (group.admin_id != current_user.user_id
+        or not user):
+        raise Exception("User not authorized")
+
+    db_group_user = postgers_models.group_users.insert().values(
+        group_id=id,
+        user_id=user.user_id
+    )
+
+    db.execute(db_group_user)
+    db.commit()
+
+    return get_group(id, current_user, db)

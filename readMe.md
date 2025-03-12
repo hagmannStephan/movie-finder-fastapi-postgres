@@ -47,3 +47,4 @@ To execute the requests in Postman, you need to create an Environment with the f
 - `$PASSWORD` (you can choose this freely)
 - `$MOVIE_ID` (you can set this based on the action you want to perform)
 - `$GROUP_ID` (you can set this based on the action you want to perform)
+- `$FRIENDSHIP_CODE` (you can set this based on the action you want to perform)

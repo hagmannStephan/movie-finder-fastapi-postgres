@@ -59,12 +59,12 @@ def read_current_user(current_user: postgers_models.User = Depends(get_current_u
         }
 )
 def get_user_favourites(id: int, current_user: postgers_models.User = Depends(get_current_user), db: Session = Depends(get_db)):
+    if current_user.user_id != id:
+        raise HTTPException(
+            status_code=status.HTTP_401_UNAUTHORIZED,
+            detail="User not authorized"
+        )
     try:
-        if current_user.user_id != id:
-            raise HTTPException(
-                status_code=status.HTTP_401_UNAUTHORIZED,
-                detail="User not authorized"
-            )
         return user_service.get_user_favourites(id, db)
     except Exception as e:
         print(e)
@@ -83,22 +83,19 @@ def get_user_favourites(id: int, current_user: postgers_models.User = Depends(ge
         }
 )
 def remove_user_favourite(id: int, movieId: int, current_user: postgers_models.User = Depends(get_current_user), db: Session = Depends(get_db)):
+    if current_user.user_id != id:
+        raise HTTPException(
+            status_code=status.HTTP_401_UNAUTHORIZED,
+            detail="User not authorized"
+        )
     try:
-        if current_user.user_id != id:
-            raise HTTPException(
-                status_code=status.HTTP_401_UNAUTHORIZED,
-                detail="User not authorized"
-            )
-        try:
-            return user_service.remove_user_favourite(id, movieId, db)
-        except:
-            raise HTTPException(
-                status_code=status.HTTP_404_NOT_FOUND,
-                detail="Movie not found"
-            )
-    except Exception as e:
-        print(e)
-        raise HTTPException(status_code=status.HTTP_500_INTERNAL_SERVER_ERROR, detail="Internal server error")
+        return user_service.remove_user_favourite(id, movieId, db)
+    except:
+        raise HTTPException(
+            status_code=status.HTTP_404_NOT_FOUND,
+            detail="Movie not found"
+        )
+
     
 
 @router.patch(
@@ -112,12 +109,12 @@ def remove_user_favourite(id: int, movieId: int, current_user: postgers_models.U
         }
 )
 def update_user_settings(id: int, settings: schemas.UserPatchSettings, current_user: postgers_models.User = Depends(get_current_user), db: Session = Depends(get_db)):
+    if current_user.user_id != id:
+        raise HTTPException(
+            status_code=status.HTTP_401_UNAUTHORIZED,
+            detail="User not authorized"
+        )
     try:
-        if current_user.user_id != id:
-            raise HTTPException(
-                status_code=status.HTTP_401_UNAUTHORIZED,
-                detail="User not authorized"
-            )
         return user_service.update_user_settings(id, settings, db)
     except Exception as e:
         print(e)
@@ -135,12 +132,12 @@ def update_user_settings(id: int, settings: schemas.UserPatchSettings, current_u
         }
 )
 def delete_user(id: int, current_user: postgers_models.User = Depends(get_current_user), db: Session = Depends(get_db)):
+    if current_user.user_id != id:
+        raise HTTPException(
+            status_code=status.HTTP_401_UNAUTHORIZED,
+            detail="User not authorized"
+        )
     try:
-        if current_user.user_id != id:
-            raise HTTPException(
-                status_code=status.HTTP_401_UNAUTHORIZED,
-                detail="User not authorized"
-            )
         return user_service.delete_user(id, db)
     except Exception as e:
         print(e)
@@ -158,12 +155,12 @@ def delete_user(id: int, current_user: postgers_models.User = Depends(get_curren
         }
 )
 def get_user_groups(id: int, current_user: postgers_models.User = Depends(get_current_user), db: Session = Depends(get_db)):
+    if current_user.user_id != id:
+        raise HTTPException(
+            status_code=status.HTTP_401_UNAUTHORIZED,
+            detail="User not authorized"
+        )
     try:
-        if current_user.user_id != id:
-            raise HTTPException(
-                status_code=status.HTTP_401_UNAUTHORIZED,
-                detail="User not authorized"
-            )
         return user_service.get_user_groups(id, db)
     except Exception as e:
         print(e)
