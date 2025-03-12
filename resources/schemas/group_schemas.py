@@ -1,13 +1,15 @@
 from pydantic import BaseModel, Field, ConfigDict
 from typing import List, Optional
 from datetime import date
+from .movie_schemas import Movie
 
-class Group(BaseModel):
-    group_id: int
+class GroupCreate(BaseModel):
     name: str = Field(..., max_length=25)
-    password: str = Field(..., max_length=50)
+
+class Group(GroupCreate):
+    group_id: int
+    created_on: date = Field(default='now()')
     admin_id: int
-    created_on: date
 
     show_movies: bool = True
     show_tv: bool = True
@@ -21,3 +23,16 @@ class Group(BaseModel):
     without_genres: Optional[List] = Field(default_factory=list)
 
     model_config = ConfigDict(from_attributes=True)
+
+class GroupQuery(Group):
+    members: List[int]
+
+class GroupMatch(BaseModel):
+    group_id: int
+    count_likes: int
+    movie: Movie
+
+
+class GroupMatchQuery(BaseModel):
+    group_members: int
+    matches: List[GroupMatch]

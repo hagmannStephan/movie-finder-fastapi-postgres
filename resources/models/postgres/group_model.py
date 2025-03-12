@@ -7,7 +7,6 @@ class Group(Base):
     __tablename__ = "groups"
     group_id = Column(Integer, primary_key=True, index=True)
     name = Column(String(25), nullable=False, index=True)
-    password = Column(String(50), nullable=False)
     admin_id = Column(Integer, ForeignKey('users.user_id'), nullable=False)
     created_on = Column(Date, nullable=False, default='now()')
 

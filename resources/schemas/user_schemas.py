@@ -96,3 +96,6 @@ class UserPatchSettings(BaseModel):
         return value
         
     model_config = ConfigDict(from_attributes=True)
+
+class GroupMember(BaseModel):
+    friend_code: str

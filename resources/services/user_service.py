@@ -1,10 +1,45 @@
 from sqlalchemy.orm import Session
 from fastapi import Depends
 from resources.services.postgresql_service import get_db
+from resources.services.auth_service import get_password_hash
 import resources.models.postgres as postgers_models
 import resources.schemas as schemas
 from sqlalchemy.sql import func
 from . import group_service
+import secrets
+
+
+def create_user(
+        user: schemas.UserCreate,
+        db: Session = Depends(get_db)
+) -> postgers_models.User:
+    db_user = db.query(postgers_models.User).filter(postgers_models.User.email == user.email).first()
+
+    # Check if user already exists
+    if db_user:
+        raise ValueError("Email already registered")
+    
+    while True:
+        friend_code = secrets.token_hex(5)[:5].upper()
+        
+        if not db.query(postgers_models.User).filter(postgers_models.User.friend_code == friend_code).first():
+            break
+    
+    # Create a new user
+    hashed_password = get_password_hash(user.password)
+    db_user = postgers_models.User(
+        name=user.name,
+        email=user.email,
+        password=hashed_password,
+        friend_code=friend_code
+    )
+
+    db.add(db_user)
+    db.commit()
+    db.refresh(db_user)
+
+    return db_user
+
 
 def get_user_favourites(
         id: int,
@@ -67,7 +102,7 @@ def delete_user(
         ).count()
 
         if member_count <= 1:
-            group_service.delete_group(group.group_id, db)
+            group_service.delete_group_helper(group.group_id, db)
         else:
             new_admin = db.query(postgers_models.group_users.c.user_id).filter(
                 postgers_models.group_users.c.group_id == group.group_id,

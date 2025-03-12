@@ -3,8 +3,7 @@ import resources.schemas as schemas
 from resources.services.postgresql_service import get_db
 from sqlalchemy.orm import Session
 import resources.models.postgres as postgers_models
-import secrets
-from resources.services.auth_service import get_password_hash, get_current_user
+from resources.services.auth_service import get_current_user
 import resources.services.user_service as user_service
 
 router = APIRouter(
@@ -18,40 +17,22 @@ router = APIRouter(
         response_model=schemas.UserCreated,
         description="Create a new user",
         responses={
-            200: {"description": "User created"},
-            400: {"description": "User with Email already exists"}
+            "200": {"description": "User created"},
+            "400": {"description": "User with Email already exists"},
+            "500": {"description": "Internal server error"}
         }
 )
 def create_user(user: schemas.UserCreate, db: Session = Depends(get_db)):
-    db_user = db.query(postgers_models.User).filter(postgers_models.User.email == user.email).first()
-
-    # Check if user already exists
-    if db_user:
-        raise HTTPException(
-            status_code=status.HTTP_400_BAD_REQUEST,
-            detail="Email already registered"
-        )
-    
-    while True:
-        friend_code = secrets.token_hex(5)[:5].upper()
-        
-        if not db.query(postgers_models.User).filter(postgers_models.User.friend_code == friend_code).first():
-            break
-    
-    # Create a new user
-    hashed_password = get_password_hash(user.password)
-    db_user = postgers_models.User(
-        name=user.name,
-        email=user.email,
-        password=hashed_password,
-        friend_code=friend_code
-    )
-    
-    db.add(db_user)
-    db.commit()
-    db.refresh(db_user)
-    
-    return db_user
+    try:
+        return user_service.create_user(user, db)
+    except ValueError as e:
+        if str(e) == "Email already registered":
+            raise HTTPException(
+                status_code=status.HTTP_400_BAD_REQUEST,
+                detail="Email already registered"
+            )
+        else:
+            raise HTTPException(status_code=status.HTTP_500_INTERNAL_SERVER_ERROR, detail="Internal server error")
 
 
 @router.get(
@@ -59,8 +40,8 @@ def create_user(user: schemas.UserCreate, db: Session = Depends(get_db)):
         response_model=schemas.User,
         description="Get current user",
         responses={
-            200: {"description": "User found"},
-            401: {"description": "User not authenticated"}
+            "200": {"description": "User found"},
+            "401": {"description": "User not authenticated"}
         }
 )
 def read_current_user(current_user: postgers_models.User = Depends(get_current_user)):
@@ -72,8 +53,9 @@ def read_current_user(current_user: postgers_models.User = Depends(get_current_u
         response_model=list[schemas.Movie],
         description="Get liked movies of a user",
         responses={
-            200: {"description": "User found"},
-            401: {"description": "User not authorized"}
+            "200": {"description": "User found"},
+            "401": {"description": "User not authorized"},
+            "500": {"description": "Internal server error"}
         }
 )
 def get_user_favourites(id: int, current_user: postgers_models.User = Depends(get_current_user), db: Session = Depends(get_db)):
@@ -82,7 +64,11 @@ def get_user_favourites(id: int, current_user: postgers_models.User = Depends(ge
             status_code=status.HTTP_401_UNAUTHORIZED,
             detail="User not authorized"
         )
-    return user_service.get_user_favourites(id, db)
+    try:
+        return user_service.get_user_favourites(id, db)
+    except Exception as e:
+        print(e)
+        raise HTTPException(status_code=status.HTTP_500_INTERNAL_SERVER_ERROR, detail="Internal server error")
 
 
 @router.delete(
@@ -90,9 +76,10 @@ def get_user_favourites(id: int, current_user: postgers_models.User = Depends(ge
         response_model=schemas.Movie,
         description="Remove a movie from the user's favourites",
         responses={
-            200: {"description": "Movie removed"},
-            401: {"description": "User not authorized"},
-            404: {"description": "Movie not found"}
+            "200": {"description": "Movie removed"},
+            "401": {"description": "User not authorized"},
+            "404": {"description": "Movie not found"},
+            "500": {"description": "Internal server error"}
         }
 )
 def remove_user_favourite(id: int, movieId: int, current_user: postgers_models.User = Depends(get_current_user), db: Session = Depends(get_db)):
@@ -108,6 +95,7 @@ def remove_user_favourite(id: int, movieId: int, current_user: postgers_models.U
             status_code=status.HTTP_404_NOT_FOUND,
             detail="Movie not found"
         )
+
     
 
 @router.patch(
@@ -115,8 +103,9 @@ def remove_user_favourite(id: int, movieId: int, current_user: postgers_models.U
         response_model=schemas.UserPatchSettings,
         description="Update user settings",
         responses={
-            200: {"description": "Settings updated"},
-            401: {"description": "User not authorized"}
+            "200": {"description": "Settings updated"},
+            "401": {"description": "User not authorized"},
+            "500": {"description": "Internal server error"}
         }
 )
 def update_user_settings(id: int, settings: schemas.UserPatchSettings, current_user: postgers_models.User = Depends(get_current_user), db: Session = Depends(get_db)):
@@ -125,7 +114,11 @@ def update_user_settings(id: int, settings: schemas.UserPatchSettings, current_u
             status_code=status.HTTP_401_UNAUTHORIZED,
             detail="User not authorized"
         )
-    return user_service.update_user_settings(id, settings, db)
+    try:
+        return user_service.update_user_settings(id, settings, db)
+    except Exception as e:
+        print(e)
+        raise
 
 
 @router.delete(
@@ -133,8 +126,9 @@ def update_user_settings(id: int, settings: schemas.UserPatchSettings, current_u
         response_model=schemas.User,
         description="Delete a user",
         responses={
-            200: {"description": "User deleted"},
-            401: {"description": "User not authorized"}
+            "200": {"description": "User deleted"},
+            "401": {"description": "User not authorized"},
+            "500": {"description": "Internal server error"}
         }
 )
 def delete_user(id: int, current_user: postgers_models.User = Depends(get_current_user), db: Session = Depends(get_db)):
@@ -143,7 +137,11 @@ def delete_user(id: int, current_user: postgers_models.User = Depends(get_curren
             status_code=status.HTTP_401_UNAUTHORIZED,
             detail="User not authorized"
         )
-    return user_service.delete_user(id, db)
+    try:
+        return user_service.delete_user(id, db)
+    except Exception as e:
+        print(e)
+        raise HTTPException(status_code=status.HTTP_500_INTERNAL_SERVER_ERROR, detail="Internal server error")
 
 
 @router.get(
@@ -151,8 +149,9 @@ def delete_user(id: int, current_user: postgers_models.User = Depends(get_curren
         response_model=list[schemas.Group],
         description="Get groups of a user",
         responses={
-            200: {"description": "Groups found"},
-            401: {"description": "User not authorized"}
+            "200": {"description": "Groups found"},
+            "401": {"description": "User not authorized"},
+            "500": {"description": "Internal server error"}
         }
 )
 def get_user_groups(id: int, current_user: postgers_models.User = Depends(get_current_user), db: Session = Depends(get_db)):
@@ -161,4 +160,8 @@ def get_user_groups(id: int, current_user: postgers_models.User = Depends(get_cu
             status_code=status.HTTP_401_UNAUTHORIZED,
             detail="User not authorized"
         )
-    return user_service.get_user_groups(id, db)
+    try:
+        return user_service.get_user_groups(id, db)
+    except Exception as e:
+        print(e)
+        raise HTTPException(status_code=status.HTTP_500_INTERNAL_SERVER_ERROR, detail="Internal server error")
