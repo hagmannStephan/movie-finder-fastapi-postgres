@@ -30,7 +30,8 @@ router = APIRouter(
     description="Get access token",
     responses={
         401: {"description": "Incorrect email or password"},
-        200: {"description": "Token created"}
+        200: {"description": "Token created"},
+        500: {"description": "Internal server error"}
     }
 )
 async def login_for_access_token(

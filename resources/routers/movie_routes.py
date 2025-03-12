@@ -21,6 +21,16 @@ router = APIRouter(
     }
 )
 
+# --------------------------------------------------------------------------------------------
+# TODO: Implement these endpoints
+# --------------------------------------------------------------------------------------------
+# GET      /movies/random                       Get a random array of movies
+# POST     /movies/{id}/right-swipe             Right swipe a movie
+# POST     /movies/{id}/left-swipe              Left swipe a movie
+# GET      /movies/search?query={keywords}      Search for movie by keywords
+# Maybe also an endpoint that gets genres, etc. that may be relevant for the UI to know
+# --------------------------------------------------------------------------------------------
+
 @router.get("/")
 async def get_movies():
     url = "https://api.themoviedb.org/3/discover/movie?include_adult=false&include_video=false&language=en-US&page=1&sort_by=popularity.desc"

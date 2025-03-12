@@ -5,8 +5,8 @@ You can find the official API documentation, created with Swagger, under the fol
 After you cloned the repo, you need to create a `.env` file in the project root that contains the following values:
 ```.env
 POSTGRES_HOST=""
-POSTGRES_PORT=""
-POSTGRES_USER=""
+POSTGRES_PORT="5432"
+POSTGRES_USER="postgres-backend"
 POSTGRES_PASSWORD=""
 POSTGRES_DB=""
 
@@ -46,3 +46,6 @@ To execute the requests in Postman, you need to create an Environment with the f
 - `$EMAIL` (you can choose this freely, but it needs to be unique in the DB)
 - `$PASSWORD` (you can choose this freely)
 - `$MOVIE_ID` (you can set this based on the action you want to perform)
+- `$GROUP_ID` (you can set this based on the action you want to perform)
+- `$FRIENDSHIP_CODE` (you can set this based on the action you want to perform)
+- `$MEMBER_ID` (you can set this based on the action you want to perform)
