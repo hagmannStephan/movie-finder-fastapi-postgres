@@ -79,3 +79,8 @@ async def get_current_user(token: str = Depends(oauth2_scheme), db: Session = De
     if user is None:
         raise credentials_exception
     return user
+
+def update_user_last_login(db: Session, user: postgers_models.User):
+    user.last_login = datetime.now(timezone.utc)
+    db.commit()
+    return user
