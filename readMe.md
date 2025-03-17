@@ -16,6 +16,7 @@ REFRESH_TOKEN_EXPIRE_DAYS=""
 ALGORITHM=""
 
 TMDB_API_KEY=""
+BASE_URL=""
 ```
 
 Since all dependencies get installed on startup of the container and the app also gets started up, you just need to run this command:
