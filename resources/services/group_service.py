@@ -67,9 +67,7 @@ def update_group(
     if not group:
         raise Exception("Group not found")
     
-    if (group.admin_id != original_group.admin_id and current_user.user_id != original_group.admin_id 
-        or original_group.group_id != group.group_id
-        or original_group.created_on != group.created_on):
+    if (group.admin_id != original_group.admin_id and current_user.user_id != original_group.admin_id):
         raise Exception("User not authorized")
     
     for key, value in original_group.dict().items():
