@@ -6,7 +6,7 @@ After you cloned the repo, you need to create a `.env` file in the project root 
 ```.env
 POSTGRES_HOST=""
 POSTGRES_PORT="5432"
-POSTGRES_USER="postgres-backend"
+POSTGRES_USER="backend"
 POSTGRES_PASSWORD=""
 POSTGRES_DB=""
 
@@ -16,7 +16,7 @@ REFRESH_TOKEN_EXPIRE_DAYS=""
 ALGORITHM=""
 
 TMDB_API_KEY=""
-BASE_URL=""
+BASE_URL="https://api.themoviedb.org/3"
 ```
 
 Since all dependencies get installed on startup of the container and the app also gets started up, you just need to run this command:

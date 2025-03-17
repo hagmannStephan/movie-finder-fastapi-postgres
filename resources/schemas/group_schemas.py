@@ -1,6 +1,6 @@
 from pydantic import BaseModel, Field, ConfigDict
 from typing import List, Optional
-from datetime import date
+from datetime import date, datetime
 from .movie_schemas import Movie
 
 class GroupCreate(BaseModel):
@@ -30,9 +30,12 @@ class GroupQuery(Group):
 class GroupMatch(BaseModel):
     group_id: int
     count_likes: int
+    last_update: datetime
     movie: Movie
-
 
 class GroupMatchQuery(BaseModel):
     group_members: int
     matches: List[GroupMatch]
+
+class GroupMember(BaseModel):
+    friend_code: str

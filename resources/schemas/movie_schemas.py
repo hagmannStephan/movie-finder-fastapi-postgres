@@ -1,11 +1,11 @@
 from pydantic import BaseModel
 from typing import List
+from datetime import datetime
 
 class MovieBase(BaseModel):
     movie_id: int
     title: str
-    poster_path: str    # https://image.tmdb.org/t/p/original/{poster_path}
-
+    liked_on: datetime
 
 class Movie(MovieBase):
     pass
@@ -13,16 +13,13 @@ class Movie(MovieBase):
     class Config:
         from_attributes = True
 
-
 class Genre(BaseModel):
     id: int
     name: str
 
-
 class GenreList(BaseModel):
     movie_genres: List[Genre]
     tv_genres: List[Genre]
-
 
 # Incomplete
 class MovieProfile(BaseModel):

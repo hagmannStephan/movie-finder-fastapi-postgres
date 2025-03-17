@@ -7,7 +7,7 @@ import resources.schemas as schemas
 from sqlalchemy.sql import func
 from . import group_service
 import secrets
-
+import json
 
 def create_user(
         user: schemas.UserCreate,
@@ -76,8 +76,23 @@ def update_user_settings(
         db: Session = Depends(get_db)
 ) -> schemas.UserPatchSettings:
     user = db.query(postgers_models.User).filter(postgers_models.User.user_id == id).first()
+
+    settings_movies = settings.settings_movies
+    if isinstance(settings_movies, str):
+        settings_movies = json.loads(settings_movies)
+
+    settings_tv = settings.settings_tv
+    if isinstance(settings_tv, str):
+        settings_tv = json.loads(settings_tv)
+    
     for key, value in settings.dict().items():
-        setattr(user, key, value)
+        if key == "settings_movies":
+            setattr(user, key, settings_movies)
+        elif key == "settings_tv":
+            setattr(user, key, settings_tv)
+        else:
+            setattr(user, key, value)
+
     db.commit()
     return settings
     

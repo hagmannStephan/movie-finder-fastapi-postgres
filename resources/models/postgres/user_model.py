@@ -107,7 +107,7 @@ class User(Base):
             "gte": 0,
             "lte": 300
         },
-        "watch_providers": [],
+        "watch_providers": []
     }))
 
     settings_tv = Column(JSON, nullable=False, default=lambda: json.dumps({

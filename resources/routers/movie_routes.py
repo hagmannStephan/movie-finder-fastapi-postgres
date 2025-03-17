@@ -45,5 +45,6 @@ async def get_movie_genres(current_user: schemas.User = Depends(get_current_user
 # POST     /movies/{id}/right-swipe             Right swipe a movie
 # POST     /movies/{id}/left-swipe              Left swipe a movie
 # GET      /movies/search?query={keywords}      Search for movie by keywords
-# GET      /movies/watch-providers              Get a list of watch providers
+# GET      /movies/watch-providers/popular      Get a list of watch providers
+# GET      /movies/watch-providers/{keyword}    Get a list of watch providers by keyword
 # --------------------------------------------------------------------------------------------
