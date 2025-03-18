@@ -21,6 +21,9 @@ class GenreList(BaseModel):
     movie_genres: List[Genre]
     tv_genres: List[Genre]
 
+    class Config:
+        from_attributes = True
+
 class MovieProfile(BaseModel):
     id: int
     title: str

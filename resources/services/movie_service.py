@@ -50,7 +50,6 @@ async def get_with_retry(client, url, headers, retries=0):
         raise Exception(status_code=e.response.status_code, detail=str(e))
 
 
-# TODO: Set timeout if return code is 429
 async def get_movie_genres(
         db: Session = Depends(get_db)
 ):
@@ -72,7 +71,9 @@ async def get_movie_genres(
             "tv_genres": tv_response.json().get("genres")
         }, db)
 
-        return cache_service.get_cache("movie_genres", db)
+        cache = cache_service.get_cache("movie_genres", db)
+
+        return {"movie_genres": cache.value.get("movie_genres"), "tv_genres": cache.value.get("tv_genres")}
 
     
 def get_random_movie(

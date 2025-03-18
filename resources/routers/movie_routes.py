@@ -42,7 +42,7 @@ async def get_random_movie(current_user: schemas.User = Depends(get_current_user
 
 @router.get(
     "/genres",
-    # response_model=schemas.GenreList,
+    response_model=schemas.GenreList,
     description="Get a list of movie genres",
     responses={
         "200": {"description": "Movie genres found"},
