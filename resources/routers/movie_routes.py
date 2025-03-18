@@ -42,15 +42,15 @@ async def get_random_movie(current_user: schemas.User = Depends(get_current_user
 
 @router.get(
     "/genres",
-    response_model=schemas.GenreList,
+    # response_model=schemas.GenreList,
     description="Get a list of movie genres",
     responses={
         "200": {"description": "Movie genres found"},    
         }
 )
-async def get_movie_genres(current_user: schemas.User = Depends(get_current_user)):
+async def get_movie_genres(current_user: schemas.User = Depends(get_current_user), db: Session = Depends(get_db)):
     try:
-        return await movie_service.get_movie_genres()
+        return await movie_service.get_movie_genres(db)
     except Exception as e:
         print(e)
         raise HTTPException(status_code=500, detail="Internal server error")

@@ -4,11 +4,11 @@ You can find the official API documentation, created with Swagger, under the fol
 ### Run the project
 After you cloned the repo, you need to create a `.env` file in the project root that contains the following values:
 ```.env
-POSTGRES_HOST=""
+POSTGRES_HOST="postgres"
 POSTGRES_PORT="5432"
-POSTGRES_USER="backend"
+POSTGRES_USER="postgres-backend"
 POSTGRES_PASSWORD=""
-POSTGRES_DB=""
+POSTGRES_DB="movieFinder-DB"
 
 SECRET_KEY =""
 ACCESS_TOKEN_EXPIRE_MINUTES=""

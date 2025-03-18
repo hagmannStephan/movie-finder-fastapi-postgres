@@ -2,6 +2,7 @@ from dotenv import load_dotenv
 from fastapi import Depends
 from resources.services.auth_service import get_current_user
 from resources.services.postgresql_service import get_db
+import resources.services.cache_service as cache_service
 import os
 import requests as req
 import httpx
@@ -22,15 +23,21 @@ headers = {
 }
 
 
-async def get_movie_genres():
-    async with httpx.AsyncClient() as client:
-        movie_task = client.get(f"{BASE_URL}/genre/movie/list?language=en", headers=headers)
-        tv_task = client.get(f"{BASE_URL}/genre/tv/list?language=en", headers=headers)
-        movie_response, tv_response = await asyncio.gather(movie_task, tv_task)
-        return {
-            "movie_genres": movie_response.json().get("genres"),
-            "tv_genres": tv_response.json().get("genres")
-        }
+async def get_movie_genres(
+        db: Session = Depends(get_db)
+):
+    #async with httpx.AsyncClient() as client:
+        # movie_task = client.get(f"{BASE_URL}/genre/movie/list?language=en", headers=headers)
+        # tv_task = client.get(f"{BASE_URL}/genre/tv/list?language=en", headers=headers)
+        # movie_response, tv_response = await asyncio.gather(movie_task, tv_task)
+        # return {
+        #     "movie_genres": movie_response.json().get("genres"),
+        #     "tv_genres": tv_response.json().get("genres")
+        # }
+    cache_service.create_cache("movie_genres", {"movie_genres": [], "tv_genres": []}, db)
+    cache_service.update_cache("movie_genres", {"movie_genres": ["Action"], "tv_genres": ["Soap"]}, db)
+    return cache_service.get_cache("movie_genres", db)
+
     
 def get_random_movie(
     current_user: schemas.User = Depends(get_current_user),
