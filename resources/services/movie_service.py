@@ -74,10 +74,21 @@ async def get_movie_genres(
         cache = cache_service.get_cache("movie_genres", db)
 
         return {"movie_genres": cache.value.get("movie_genres"), "tv_genres": cache.value.get("tv_genres")}
+    
+
+def preload_session_movies(
+        current_user: schemas.User,
+        db: Session
+):
+    pass
 
     
 def get_random_movie(
     current_user: schemas.User = Depends(get_current_user),
     db: Session = Depends(get_db)
 ):
-    pass
+    session_movie = current_user.session.next_movie
+    
+    if not session_movie or len(session_movie) < 15:
+        print("In if 1")
+        preload_session_movies(current_user, db)

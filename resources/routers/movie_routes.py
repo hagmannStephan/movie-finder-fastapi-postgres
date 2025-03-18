@@ -27,16 +27,20 @@ router = APIRouter(
 
 @router.get(
         "/random",
-        response_model=schemas.MovieProfile,
+        # response_model=schemas.MovieProfile,
         description="Get a random movie",
         responses={
             "200": {"description": "Random movie found"},
+            "429": {"description": "Rate limit exceeded after maximum retries"},
+            "500": {"description": "Internal server error"}
         }
 )
 async def get_random_movie(current_user: schemas.User = Depends(get_current_user), db: Session = Depends(get_db)):
     try:
         return await movie_service.get_random_movie(current_user, db)
     except Exception as e:
+        if str(e == "Rate limit exceeded after maximum retries"):
+            raise HTTPException(status_code=429, detail="Rate limit exceeded after maximum retries")
         print(e)
         raise HTTPException(status_code=500, detail="Internal server error")
 
@@ -63,7 +67,6 @@ async def get_movie_genres(current_user: schemas.User = Depends(get_current_user
 # --------------------------------------------------------------------------------------------
 # TODO: Implement these endpoints
 # --------------------------------------------------------------------------------------------
-# GET      /movies/random                       Get a random array of movies
 # POST     /movies/{id}/right-swipe             Right swipe a movie
 # POST     /movies/{id}/left-swipe              Left swipe a movie
 # GET      /movies/search?query={keywords}      Search for movie by keywords
