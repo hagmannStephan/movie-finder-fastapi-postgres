@@ -76,11 +76,25 @@ async def get_movie_genres(
         return {"movie_genres": cache.value.get("movie_genres"), "tv_genres": cache.value.get("tv_genres")}
     
 
-def preload_session_movies(
+# Datasource Nr. 1.1
+def discover_movie(
         current_user: schemas.User,
         db: Session
 ):
     pass
+
+# Datasource Nr. 1
+def discover(
+        current_user: schemas.User,
+        db: Session
+):
+    return discover_movie(current_user, db)
+
+def preload_session_movies(
+        current_user: schemas.User,
+        db: Session
+):
+    return discover(current_user, db)
 
     
 def get_random_movie(
@@ -90,5 +104,5 @@ def get_random_movie(
     session_movie = current_user.session.next_movie
     
     if not session_movie or len(session_movie) < 15:
-        print("In if 1")
+        print("Debug: Preloading session movies because either not found or less than 15 (#1)")
         preload_session_movies(current_user, db)

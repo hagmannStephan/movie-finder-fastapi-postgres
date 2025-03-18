@@ -5,3 +5,4 @@ __pycache__/
 README.md
 .dockerignore
 movieFinder_backendDB.postman_collection.json
+LICENSE

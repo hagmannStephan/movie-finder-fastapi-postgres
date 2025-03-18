@@ -20,13 +20,13 @@ class User(Base):
     # ----------------------------------------------------------------------------------------
     # Mix from the following
     # 1. Movies according to settings (if enabled)
-    #   - Discover via popularity_desc (page, vote_count_gte, vote_avrage_gte)
-    #   - Discover via primary_release_date.desc (release_date, vote_avrage, vote_count)
+    #   1.1 Discover via popularity_desc (page, vote_count_gte, vote_avrage_gte)
+    #   1.2 Discover via primary_release_date.desc (release_date, vote_avrage, vote_count)
     # 2. TV Shows according to settings (if enabled)
-    #   - Discover via popularity_desc (page, vote_count desc., vote_avrage desc.)
-    #   - Discover via first_air_date.desc (release_date, vote_avrage, vote_count)
+    #   2.1 Discover via popularity_desc (page, vote_count desc., vote_avrage desc.)
+    #   2.2 Discover via first_air_date.desc (release_date, vote_avrage, vote_count)
     # 3. Movies and TVs from friends
-    #   - Discover via group_matches that user hasn't liked / disliked yet but is part of
+    #   3.1 Discover via group_matches that user hasn't liked / disliked yet but is part of
     # 4. Similar movies and TV show to already liked ones
     # ----------------------------------------------------------------------------------------
     session = Column(JSON, nullable=False, default=lambda: json.dumps({
