@@ -34,9 +34,9 @@ def update_cache(
         db: Session
 ):
     cache = db.query(postgers_models.Cache).filter(postgers_models.Cache.key == key).first()
-    
+
     if not cache:
-        return None
+        cache = create_cache(key, value, db)
     
     cache.value = value
     db.commit()
