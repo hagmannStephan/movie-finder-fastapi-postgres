@@ -45,13 +45,17 @@ async def get_random_movie(current_user: schemas.User = Depends(get_current_user
     # response_model=schemas.GenreList,
     description="Get a list of movie genres",
     responses={
-        "200": {"description": "Movie genres found"},    
+        "200": {"description": "Movie genres found"},
+        "429": {"description": "Rate limit exceeded after maximum retries"},
+        "500": {"description": "Internal server error"}
         }
 )
 async def get_movie_genres(current_user: schemas.User = Depends(get_current_user), db: Session = Depends(get_db)):
     try:
         return await movie_service.get_movie_genres(db)
     except Exception as e:
+        if str(e == "Rate limit exceeded after maximum retries"):
+            raise HTTPException(status_code=429, detail="Rate limit exceeded after maximum retries")
         print(e)
         raise HTTPException(status_code=500, detail="Internal server error")
     
