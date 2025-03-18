@@ -1,8 +1,15 @@
 from dotenv import load_dotenv
+from fastapi import Depends
+from resources.services.auth_service import get_current_user
+from resources.services.postgresql_service import get_db
 import os
 import requests as req
 import httpx
 import asyncio
+import resources.schemas as schemas
+from sqlalchemy.orm import Session
+
+
 
 load_dotenv()
 
@@ -24,3 +31,9 @@ async def get_movie_genres():
             "movie_genres": movie_response.json().get("genres"),
             "tv_genres": tv_response.json().get("genres")
         }
+    
+def get_random_movie(
+    current_user: schemas.User = Depends(get_current_user),
+    db: Session = Depends(get_db)
+):
+    pass

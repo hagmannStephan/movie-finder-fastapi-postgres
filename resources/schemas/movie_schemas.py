@@ -1,6 +1,6 @@
 from pydantic import BaseModel
 from typing import List
-from datetime import datetime
+from datetime import datetime, date
 
 class MovieBase(BaseModel):
     movie_id: int
@@ -21,12 +21,19 @@ class GenreList(BaseModel):
     movie_genres: List[Genre]
     tv_genres: List[Genre]
 
-# Incomplete
 class MovieProfile(BaseModel):
-    genres: List[str]
+    id: int
+    title: str
+    genres: List[Genre]
     overview: str
-    backdrop_path: str  # https://image.tmdb.org/t/p/original/{backdrop_path}
-    original_language: str
-    release_date: str
+    release_date: date
     vote_average: float
     vote_count: int
+    runtime: int
+    tagline: str
+    keywords: List[str]
+
+    # https://image.tmdb.org/t/p/original/{path}
+    poster_path: str
+    backdrop_path: str
+    images_path: List[str]
