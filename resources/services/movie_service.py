@@ -74,35 +74,64 @@ async def get_movie_genres(
         cache = cache_service.get_cache("movie_genres", db)
 
         return {"movie_genres": cache.value.get("movie_genres"), "tv_genres": cache.value.get("tv_genres")}
+
+async def get_movies_by_popularity(
+        current_user: schemas.User = Depends(get_current_user),
+        db: Session = Depends(get_db)
+):
+    async with httpx.AsyncClient() as client:
+        movies_by_popularity = await get_with_retry(
+            client,
+            f"{BASE_URL}/discover/movie?include_adult=false&include_video=false&language=en-US&page=1&sort_by=popularity.desc",
+            headers
+        )
+        return movies_by_popularity
     
-
-# Datasource Nr. 1.1
-def discover_movie(
-        current_user: schemas.User,
-        db: Session
+async def parse_movie_to_movieProfile(
+        current_user: schemas.User = Depends(get_current_user),
+        db: Session = Depends(get_db),
+        movie_id: int = None
 ):
-    pass
+    async with httpx.AsyncClient() as client:
+        movie_detailed = get_with_retry(
+            client,
+            f"{BASE_URL}/movie/{movie_id}?language=en-US",
+            headers
+        )
+        movie_keywords = get_with_retry(
+            client,
+            f"{BASE_URL}/movie/{movie_id}/keywords",
+            headers
+        )
+        movie_additional_images = get_with_retry(
+            client,
+            f"{BASE_URL}/movie/{movie_id}/images?include_image_language=en",
+            headers
+        )
+        movie_detailed, movie_keywords, movie_additional_images = await asyncio.gather(movie_detailed, movie_keywords, movie_additional_images)
 
-# Datasource Nr. 1
-def discover(
-        current_user: schemas.User,
-        db: Session
-):
-    return discover_movie(current_user, db)
-
-def preload_session_movies(
-        current_user: schemas.User,
-        db: Session
-):
-    return discover(current_user, db)
+        return {
+            "id": movie_detailed.json().get("id"),
+            "title": movie_detailed.json().get("title"),
+            "genres": [schemas.Genre(**genre) for genre in movie_detailed.json().get("genres", [])],
+            "overview": movie_detailed.json().get("overview") or "",
+            "release_date": datetime.strptime(movie_detailed.json().get("release_date"), "%Y-%m-%d").date() if movie_detailed.json().get("release_date") else None,
+            "vote_average": movie_detailed.json().get("vote_average"),
+            "vote_count": movie_detailed.json().get("vote_count"),
+            "runtime": movie_detailed.json().get("runtime"),
+            "tagline": movie_detailed.json().get("tagline") or "",
+            "keywords": [kw["name"] for kw in movie_keywords.json().get("keywords", [])] or "",
+            "poster_path": movie_detailed.json().get("poster_path"),
+            "backdrop_path": movie_detailed.json().get("backdrop_path") or "",
+            "images_path": [img["file_path"] for img in movie_additional_images.json().get("backdrops", [])]
+        }
 
     
-def get_random_movie(
+async def get_random_movie(
     current_user: schemas.User = Depends(get_current_user),
     db: Session = Depends(get_db)
 ):
-    session_movie = current_user.session.next_movie
-    
-    if not session_movie or len(session_movie) < 15:
-        print("Debug: Preloading session movies because either not found or less than 15 (#1)")
-        preload_session_movies(current_user, db)
+    movies_by_popularity = await get_movies_by_popularity(current_user, db)
+    movie_profile = await parse_movie_to_movieProfile(current_user, db, movies_by_popularity.json().get("results")[0].get("id"))
+
+    return movie_profile

@@ -40,3 +40,6 @@ class MovieProfile(BaseModel):
     poster_path: str
     backdrop_path: str
     images_path: List[str]
+
+    class Config:
+        from_attributes = True

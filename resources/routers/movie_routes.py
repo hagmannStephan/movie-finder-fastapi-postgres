@@ -27,7 +27,7 @@ router = APIRouter(
 
 @router.get(
         "/random",
-        # response_model=schemas.MovieProfile,
+        response_model=schemas.MovieProfile,
         description="Get a random movie",
         responses={
             "200": {"description": "Random movie found"},

@@ -23,3 +23,14 @@ SELECT cron.schedule(
     WHERE created_at < NOW() - INTERVAL '6 months'
     $$
 );
+
+-- Schedule a job to clean up old cache entries (runs daily at midnight)
+SELECT cron.schedule(
+    'delete_old_cache_entries',
+    '0 0 * * *',  -- Runs daily at midnight
+    $$
+    DELETE FROM cache
+    WHERE updated_at IS NOT NULL 
+      AND updated_at < NOW() - INTERVAL '6 months'
+    $$
+);
