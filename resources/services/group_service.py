@@ -1,6 +1,7 @@
 from sqlalchemy.orm import Session
 from fastapi import Depends
 from resources.services.postgresql_service import get_db
+import json
 import resources.models.postgres as postgers_models
 import resources.schemas as schemas
 
@@ -166,9 +167,35 @@ def get_group_matches(
 
     for match in matches:
         movie = db.query(postgers_models.Movie).filter(postgers_models.Movie.movie_id == match.movie_id).first()
+        
+        if not movie:
+            continue
+
+        print(json.dumps(movie.__dict__, default=str))
+
+        movie_profile = schemas.MovieProfile(
+            id=movie.movie_id,
+            title=movie.title or "",
+            genres = [
+                schemas.Genre(name=g) if isinstance(g, str) else schemas.Genre(name=g.get('name', ''), id=g.get('id', 0))
+                for g in movie.genres
+            ] if movie.genres else [],
+            overview=movie.overview or "",
+            release_date=movie.release_date or "",
+            vote_average=movie.vote_average or 0.0,
+            vote_count=movie.vote_count or 0,
+            runtime=movie.runtime or 0,
+            tagline=movie.tagline or "",
+            keywords=movie.keywords or [],
+            poster_path=movie.poster_path or "",
+            backdrop_path=movie.backdrop_path or "",
+            images_path=movie.images_path or []
+        )
+
+        # Create the match dictionary
         match_dict = schemas.GroupMatch(
-            **{key: value for key, value in match._asdict().items() if key != 'movie_id'},
-            movie=movie
+            **match._asdict(),
+            movie=movie_profile
         )
         match_dicts.append(match_dict)
 

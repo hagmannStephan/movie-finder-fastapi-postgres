@@ -1,17 +1,6 @@
-from pydantic import BaseModel
+from pydantic import BaseModel, Field
 from typing import List
-from datetime import datetime, date
-
-class MovieBase(BaseModel):
-    movie_id: int
-    title: str
-    liked_on: datetime
-
-class Movie(MovieBase):
-    pass
-
-    class Config:
-        from_attributes = True
+from datetime import date
 
 class Genre(BaseModel):
     id: int
@@ -24,11 +13,11 @@ class GenreList(BaseModel):
     class Config:
         from_attributes = True
 
-class MovieProfile(BaseModel):
-    id: int
+class Movie(BaseModel):
+    id: int = Field(..., alias='movie_id')  # Alias to map movie_id to id
     title: str
-    genres: List[Genre]
     overview: str
+    genres: List[Genre]
     release_date: date
     vote_average: float
     vote_count: int
@@ -41,5 +30,10 @@ class MovieProfile(BaseModel):
     backdrop_path: str
     images_path: List[str]
 
+    class Config:
+        from_orm = True
+
+class MovieProfile(Movie):
+    
     class Config:
         from_attributes = True

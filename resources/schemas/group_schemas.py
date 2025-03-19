@@ -1,7 +1,7 @@
 from pydantic import BaseModel, Field, ConfigDict, field_validator
 from typing import List, Optional, Dict, Any
 from datetime import date, datetime
-from .movie_schemas import Movie
+from .movie_schemas import MovieProfile as Movie
 import json
 
 class GroupCreate(BaseModel):

@@ -131,6 +131,9 @@ async def get_random_movie(
     current_user: schemas.User = Depends(get_current_user),
     db: Session = Depends(get_db)
 ):
+    # TODO: Discover should always return a new movie according to use settings
+    # TODO: Save relevant movies in db
+    # TODO: Implement other datasources
     movies_by_popularity = await get_movies_by_popularity(current_user, db)
     movie_profile = await parse_movie_to_movieProfile(current_user, db, movies_by_popularity.json().get("results")[0].get("id"))
 

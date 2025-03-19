@@ -50,7 +50,7 @@ def read_current_user(current_user: postgers_models.User = Depends(get_current_u
 
 @router.get(
         "/{id}/favourites",
-        response_model=list[schemas.Movie],
+        response_model=list[schemas.MovieProfile],
         description="Get liked movies of a user",
         responses={
             "200": {"description": "User found"},
@@ -73,7 +73,7 @@ def get_user_favourites(id: int, current_user: postgers_models.User = Depends(ge
 
 @router.delete(
         "/{id}/favourites/{movieId}",
-        response_model=schemas.Movie,
+        response_model=schemas.MovieProfile,
         description="Remove a movie from the user's favourites",
         responses={
             "200": {"description": "Movie removed"},

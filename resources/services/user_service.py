@@ -44,23 +44,23 @@ def create_user(
 def get_user_favourites(
         id: int,
         db: Session = Depends(get_db),
-) -> list[schemas.Movie]:
+) -> list[schemas.MovieProfile]:
     favourite_movies = (
         db.query(postgers_models.Movie)
         .join(postgers_models.user_movies)
         .filter(postgers_models.user_movies.c.user_id == id)
         .all()
     )
-    return favourite_movies
+    return [schemas.MovieProfile.from_orm(movie) for movie in favourite_movies]
 
 def remove_user_favourite(
         id: int,
         movie_id: int,
         db: Session = Depends(get_db)
-) -> schemas.Movie:
+) -> schemas.MovieProfile:
     user_favourites = get_user_favourites(id, db)
     for movie in user_favourites:
-        if movie.movie_id == movie_id:
+        if movie.id == movie_id:
             db.query(postgers_models.user_movies).filter(
                 postgers_models.user_movies.c.user_id == id,
                 postgers_models.user_movies.c.movie_id == movie_id
