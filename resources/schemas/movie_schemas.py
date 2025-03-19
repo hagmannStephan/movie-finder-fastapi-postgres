@@ -13,8 +13,7 @@ class GenreList(BaseModel):
     class Config:
         from_attributes = True
 
-class Movie(BaseModel):
-    id: int = Field(..., alias='movie_id')  # Alias to map movie_id to id
+class BaseMovie(BaseModel):
     title: str
     overview: str
     genres: List[Genre]
@@ -31,9 +30,12 @@ class Movie(BaseModel):
     images_path: List[str]
 
     class Config:
+        from_attributes = True
         from_orm = True
 
-class MovieProfile(Movie):
-    
-    class Config:
-        from_attributes = True
+class MovieFavourites(BaseMovie):
+    id: int = Field(..., alias='movie_id')  # Alias to map movie_id to id
+
+
+class MovieProfile(BaseMovie):
+    id: int
