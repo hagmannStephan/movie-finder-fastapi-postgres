@@ -28,6 +28,7 @@ class BaseMovie(BaseModel):
     poster_path: str
     backdrop_path: str
     images_path: List[str]
+    watch_providers: dict
 
     class Config:
         from_attributes = True

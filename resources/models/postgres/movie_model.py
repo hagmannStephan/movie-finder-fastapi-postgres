@@ -21,4 +21,6 @@ class Movie(Base):
     backdrop_path = Column(String(100), nullable=True)
     images_path = Column(JSON, nullable=True)
 
+    watch_providers = Column(JSON, nullable=True)
+
     created_at = Column(DateTime, default=datetime.now(timezone.utc), nullable=False)

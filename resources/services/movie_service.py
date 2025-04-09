@@ -4,15 +4,16 @@ from resources.services.auth_service import get_current_user
 from resources.services.postgresql_service import get_db
 import resources.services.cache_service as cache_service
 import os
-import requests as req
 import httpx
 import asyncio
 import resources.schemas as schemas
 from sqlalchemy.orm import Session
 from datetime import datetime, timedelta
 import random
-
-
+from typing import Dict, Any, Optional
+from sqlalchemy.exc import SQLAlchemyError
+from sqlalchemy import text
+from resources.models.postgres.user_model import User
 load_dotenv()
 
 BASE_URL = os.getenv("BASE_URL")
@@ -108,7 +109,12 @@ async def parse_movie_to_movieProfile(
             f"{BASE_URL}/movie/{movie_id}/images?include_image_language=en",
             headers
         )
-        movie_detailed, movie_keywords, movie_additional_images = await asyncio.gather(movie_detailed, movie_keywords, movie_additional_images)
+        movie_watch_providers = get_with_retry(
+            client,
+            f"{BASE_URL}/movie/{movie_id}/watch/providers",
+            headers
+        )
+        movie_detailed, movie_keywords, movie_additional_images, movie_watch_providers = await asyncio.gather(movie_detailed, movie_keywords, movie_additional_images, movie_watch_providers)
 
         return {
             "id": movie_detailed.json().get("id"),
@@ -123,18 +129,63 @@ async def parse_movie_to_movieProfile(
             "keywords": [kw["name"] for kw in movie_keywords.json().get("keywords", [])] or "",
             "poster_path": movie_detailed.json().get("poster_path"),
             "backdrop_path": movie_detailed.json().get("backdrop_path") or "",
-            "images_path": [img["file_path"] for img in movie_additional_images.json().get("backdrops", [])]
+            "images_path": [img["file_path"] for img in movie_additional_images.json().get("backdrops", [])],
+            "watch_providers": movie_watch_providers.json().get("results", {}).get("CH", {})
         }
+    
+def get_user_session(
+    current_user: schemas.User,
+    db: Session
+) -> Optional[Dict[str, Any]]:
+    user = db.query(User).filter(User.user_id == current_user.user_id).first()
+    if user:
+        return user.session
+    return None
+
+
+def update_user_session(
+    session: Dict[str, Any],
+    current_user: schemas.User = Depends(get_current_user),
+    db: Session = Depends(get_db)
+):
+    # Example logic to handle the session parameter
+    user = db.query(User).filter(User.user_id == current_user.user_id).first()
+    if user:
+        user.session = session
+        db.commit()
+        return {"message": "Session updated successfully"}
+    return {"message": "User not found"}
 
     
 async def get_random_movie(
     current_user: schemas.User = Depends(get_current_user),
     db: Session = Depends(get_db)
 ):
-    # TODO: Discover should always return a new movie according to use settings
     # TODO: Save relevant movies in db
     # TODO: Implement other datasources
-    movies_by_popularity = await get_movies_by_popularity(current_user, db)
+    print("Before session")
+    session = get_user_session(current_user, db)
+    print("Session: ", session)
+
+    if len(session["next_movies"]) < 15:
+        print("In if statement")
+        movies_by_popularity = await get_movies_by_popularity(current_user, db)
+        print("Did it do here")
+
+        print("First entry:", movies_by_popularity.json().get("results", [])[0])
+
+        for movie in movies_by_popularity.json().get("results", []):
+            session["next_movies"].append(movie.get("id"))            # TODO: also save the movies in the db so you dont have to query all the time
+
+        print("Appending worked")
+        
+    
+    # TODO: Pay attention to use settings and movie session methods
+    
+    # TODO: Get lates of the movies in db from user
+    # TODO: If movie doesn't exsist - load it
+    print("Before movie_profile")
     movie_profile = await parse_movie_to_movieProfile(current_user, db, movies_by_popularity.json().get("results")[0].get("id"))
+    print("After movie_profile")
 
     return movie_profile

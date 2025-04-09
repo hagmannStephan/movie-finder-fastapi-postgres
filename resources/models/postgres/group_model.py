@@ -22,7 +22,7 @@ class Group(Base):
             "gte": "1900-01-01",
             "lte": None
         },
-        "vote_avrage": {
+        "vote_average": {
             "gte": 0,
             "lte": 10
         },
@@ -45,7 +45,7 @@ class Group(Base):
             "gte": "1900-01-01",
             "lte": None
         },
-        "vote_avrage": {
+        "vote_average": {
             "gte": 0,
             "lte": 10
         },
