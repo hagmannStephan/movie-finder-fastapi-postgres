@@ -8,6 +8,12 @@ from sqlalchemy.sql import func
 from . import group_service
 import secrets
 import json
+from fastapi import Depends, HTTPException
+from sqlalchemy.orm import Session
+from typing import List
+import logging
+
+logger = logging.getLogger(__name__)
 
 def create_user(
         user: schemas.UserCreate,
@@ -42,16 +48,29 @@ def create_user(
 
 
 def get_user_favourites(
-        id: int,
-        db: Session = Depends(get_db),
-) -> list[schemas.MovieFavourites]:
-    favourite_movies = (
-        db.query(postgers_models.Movie)
-        .join(postgers_models.user_movies)
-        .filter(postgers_models.user_movies.c.user_id == id)
-        .all()
-    )
-    return [schemas.MovieFavourites.from_orm(movie) for movie in favourite_movies]
+    id: int,
+    db: Session = Depends(get_db),
+) -> List[schemas.MovieFavourites]:
+    try:
+        favourite_movies = (
+            db.query(postgers_models.Movie)
+            .join(postgers_models.user_movies)
+            .filter(postgers_models.user_movies.c.user_id == id)
+            .all()
+        )
+
+        if not favourite_movies:
+            logger.info(f"No favourite movies found for user with id {id}")
+            raise HTTPException(status_code=404, detail="No favourite movies found for this user.")
+
+        return [schemas.MovieFavourites.from_orm(movie) for movie in favourite_movies]
+
+    except HTTPException:
+        raise  # re-raise to avoid catching it in the generic exception block
+
+    except Exception as e:
+        logger.error(f"Unexpected error while fetching favourites for user {id}: {e}")
+        raise HTTPException(status_code=500, detail="Internal server error fetching favourite movies.")
 
 def remove_user_favourite(
         id: int,

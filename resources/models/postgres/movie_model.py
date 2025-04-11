@@ -24,3 +24,10 @@ class Movie(Base):
     watch_providers = Column(JSON, nullable=True)
 
     created_at = Column(DateTime, default=datetime.now(timezone.utc), nullable=False)
+
+    def __repr__(self):
+        return (
+            f"<Movie(movie_id={self.movie_id}, title={self.title}, "
+            f"release_date={self.release_date}, vote_average={self.vote_average}, "
+            f"runtime={self.runtime}, watch_providers={self.watch_providers})>"
+        )

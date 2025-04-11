@@ -171,8 +171,6 @@ def get_group_matches(
         if not movie:
             continue
 
-        print(json.dumps(movie.__dict__, default=str))
-
         movie_profile = schemas.MovieProfile(
             id=movie.movie_id,
             title=movie.title or "",

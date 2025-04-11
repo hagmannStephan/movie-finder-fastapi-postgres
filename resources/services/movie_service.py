@@ -11,9 +11,8 @@ from sqlalchemy.orm import Session
 from datetime import datetime, timedelta
 import random
 from typing import Dict, Any, Optional
-from sqlalchemy.exc import SQLAlchemyError
-from sqlalchemy import text
-from resources.models.postgres.user_model import User
+import resources.models.postgres as postgers_models
+
 load_dotenv()
 
 BASE_URL = os.getenv("BASE_URL")
@@ -137,7 +136,7 @@ def get_user_session(
     current_user: schemas.User,
     db: Session
 ) -> Optional[Dict[str, Any]]:
-    user = db.query(User).filter(User.user_id == current_user.user_id).first()
+    user = db.query(postgers_models.User).filter(postgers_models.User.user_id == current_user.user_id).first()
     if user:
         return user.session
     return None
@@ -149,7 +148,7 @@ def update_user_session(
     db: Session = Depends(get_db)
 ):
     # Example logic to handle the session parameter
-    user = db.query(User).filter(User.user_id == current_user.user_id).first()
+    user = db.query(postgers_models.User).filter(postgers_models.User.user_id == current_user.user_id).first()
     if user:
         user.session = session
         db.commit()
@@ -163,29 +162,18 @@ async def get_random_movie(
 ):
     # TODO: Save relevant movies in db
     # TODO: Implement other datasources
-    print("Before session")
     session = get_user_session(current_user, db)
-    print("Session: ", session)
 
     if len(session["next_movies"]) < 15:
-        print("In if statement")
         movies_by_popularity = await get_movies_by_popularity(current_user, db)
-        print("Did it do here")
-
-        print("First entry:", movies_by_popularity.json().get("results", [])[0])
 
         for movie in movies_by_popularity.json().get("results", []):
-            session["next_movies"].append(movie.get("id"))            # TODO: also save the movies in the db so you dont have to query all the time
-
-        print("Appending worked")
-        
+            session["next_movies"].append(movie.get("id"))            # TODO: also save the movies in the db so you dont have to query all the time        
     
     # TODO: Pay attention to use settings and movie session methods
     
     # TODO: Get lates of the movies in db from user
     # TODO: If movie doesn't exsist - load it
-    print("Before movie_profile")
     movie_profile = await parse_movie_to_movieProfile(current_user, db, movies_by_popularity.json().get("results")[0].get("id"))
-    print("After movie_profile")
 
     return movie_profile
