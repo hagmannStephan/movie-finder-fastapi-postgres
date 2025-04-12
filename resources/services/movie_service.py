@@ -161,10 +161,10 @@ async def get_random_movie(
     current_user: schemas.User = Depends(get_current_user),
     db: Session = Depends(get_db)
 ):
-    # TODO: Save relevant movies in db
-    # TODO: Implement other datasources
     session = get_user_session(current_user, db)
-    print("Session before:", session)
+
+    # TODO: Pay attention to use settings and movie session methods
+    # TODO: Implement other datasources (likes from other users, latest releases, similar to already liked movies, etc.)
 
     if len(session["next_movies"]) < 15:
         movies_by_popularity = await get_movies_by_popularity(current_user, db)
@@ -177,12 +177,10 @@ async def get_random_movie(
     else:
         id = session["next_movies"][0]
     
-    # TODO: Pay attention to use settings and movie session methods
-    
+    # TODO: Save relevant movies in db
     # TODO: Get likes of the movies in db from user
 
-    # TODO: If movie doesn't exsist - load it
-    
+    # If movie doesn't exsist - load it
     movie_profile = await parse_movie_to_movieProfile(current_user, db, id)
     
     return movie_profile
@@ -196,24 +194,20 @@ async def like_movie(
     user = db.query(postgers_models.User).filter(postgers_models.User.user_id == current_user.user_id).first()
     
     if user and id in user.session["next_movies"]:
-        print("Movie is in session, removing it...")
-        print("user_session before:", user.session["next_movies"])
         user.session["next_movies"].remove(id)
-        print("Movie removed from session:", user.session["next_movies"])
         
         # Explicitly mark the session column as modified
         attributes.flag_modified(user, "session")
         
         # Commit the changes
         db.commit()
-        print("Session updated in DB:", user.session)
+
     # Like movie by updating the user_movies table
     user = db.query(postgers_models.User).filter(postgers_models.User.user_id == current_user.user_id).first()
 
     # Ensure movie exists
     movie = db.query(postgers_models.Movie).filter(postgers_models.Movie.movie_id == id).first()
     if not movie:
-        print("Movie not found in the database. Fetching from external API...")
         movie_profile = await parse_movie_to_movieProfile(current_user, db, id)
         
         movie = postgers_models.Movie(
@@ -235,9 +229,6 @@ async def like_movie(
         db.add(movie)
         db.commit()
         db.refresh(movie)
-        print("Movie added to the database:", movie)
-    else:
-        print("Movie already exists in the database:", movie)
 
     # Check if already liked
     already_liked = db.execute(
@@ -246,10 +237,8 @@ async def like_movie(
             (postgers_models.user_movies.c.movie_id == id)
         )
     ).first()
-    print("Checked if user liked the movie: ", already_liked)
 
     if not already_liked:
-        print("In if")
         db.execute(
             postgers_models.user_movies.insert().values(
                 user_id=user.user_id,
@@ -257,9 +246,53 @@ async def like_movie(
                 liked_on=datetime.now()
             )
         )
+        
+        # Update or create entry in the group_matches table
+        # 1. Get all groups the user is part of
+        group_users = db.query(postgers_models.Group).join(
+            postgers_models.group_users,
+            postgers_models.group_users.c.group_id == postgers_models.Group.group_id
+        ).filter(
+            postgers_models.group_users.c.user_id == user.user_id
+        ).all()
+        
+        current_time = datetime.now()
+        
+        # 2. For each group, update or create a group_matches entry
+        for group in group_users:
+            # Check if there's an existing match for this group and movie
+            existing_match = db.execute(
+                postgers_models.group_matches.select().where(
+                    (postgers_models.group_matches.c.group_id == group.group_id) &
+                    (postgers_models.group_matches.c.movie_id == id)
+                )
+            ).first()
+            
+            if existing_match:
+                # 3. If yes: Increment count_likes and update last_update
+                db.execute(
+                    postgers_models.group_matches.update().where(
+                        (postgers_models.group_matches.c.group_id == group.group_id) &
+                        (postgers_models.group_matches.c.movie_id == id)
+                    ).values(
+                        count_likes=existing_match.count_likes + 1,
+                        last_update=current_time
+                    )
+                )
+            else:
+                # 4. If no: Add a new entry with count_likes=1
+                db.execute(
+                    postgers_models.group_matches.insert().values(
+                        group_id=group.group_id,
+                        movie_id=id,
+                        count_likes=1,
+                        last_update=current_time
+                    )
+                )
+        
+        # Commit the changes for all group matches
         db.commit()
-        print("After insert")
-    
+        
     return movie
 
     # TODO: Update or create entry in the group_matches table

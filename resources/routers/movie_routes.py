@@ -85,7 +85,6 @@ async def like_movie(current_user: schemas.User = Depends(get_current_user), db:
 # --------------------------------------------------------------------------------------------
 # TODO: Implement these endpoints
 # --------------------------------------------------------------------------------------------
-# POST     /movies/{id}/right-swipe             Right swipe a movie
 # POST     /movies/{id}/left-swipe              Left swipe a movie
 # GET      /movies/search?query={keywords}      Search for movie by keywords
 # GET      /movies/watch-providers/popular      Get a list of watch providers
