@@ -1,5 +1,5 @@
 from dotenv import load_dotenv
-from fastapi import Depends
+from fastapi import Depends, HTTPException
 from resources.services.auth_service import get_current_user
 from resources.services.postgresql_service import get_db
 import resources.services.cache_service as cache_service
@@ -7,7 +7,7 @@ import os
 import httpx
 import asyncio
 import resources.schemas as schemas
-from sqlalchemy.orm import Session
+from sqlalchemy.orm import Session, attributes
 from datetime import datetime, timedelta
 import random
 from typing import Dict, Any, Optional
@@ -147,14 +147,15 @@ def update_user_session(
     current_user: schemas.User = Depends(get_current_user),
     db: Session = Depends(get_db)
 ):
-    # Example logic to handle the session parameter
+    from sqlalchemy.orm import attributes
+    
     user = db.query(postgers_models.User).filter(postgers_models.User.user_id == current_user.user_id).first()
     if user:
         user.session = session
+        attributes.flag_modified(user, "session")
         db.commit()
         return {"message": "Session updated successfully"}
     return {"message": "User not found"}
-
     
 async def get_random_movie(
     current_user: schemas.User = Depends(get_current_user),
@@ -163,17 +164,102 @@ async def get_random_movie(
     # TODO: Save relevant movies in db
     # TODO: Implement other datasources
     session = get_user_session(current_user, db)
+    print("Session before:", session)
 
     if len(session["next_movies"]) < 15:
         movies_by_popularity = await get_movies_by_popularity(current_user, db)
 
         for movie in movies_by_popularity.json().get("results", []):
-            session["next_movies"].append(movie.get("id"))            # TODO: also save the movies in the db so you dont have to query all the time        
+            session["next_movies"].append(movie.get("id"))
+            update_user_session(session, current_user, db)
+            id = movies_by_popularity.json().get("results")[0].get("id")
+              
+    else:
+        id = session["next_movies"][0]
     
     # TODO: Pay attention to use settings and movie session methods
     
-    # TODO: Get lates of the movies in db from user
-    # TODO: If movie doesn't exsist - load it
-    movie_profile = await parse_movie_to_movieProfile(current_user, db, movies_by_popularity.json().get("results")[0].get("id"))
+    # TODO: Get likes of the movies in db from user
 
+    # TODO: If movie doesn't exsist - load it
+    
+    movie_profile = await parse_movie_to_movieProfile(current_user, db, id)
+    
     return movie_profile
+
+async def like_movie(
+    current_user: schemas.User = Depends(get_current_user),
+    db: Session = Depends(get_db),
+    id: int = None
+):
+    # Check if movie is in session, if yes - remove it from session
+    user = db.query(postgers_models.User).filter(postgers_models.User.user_id == current_user.user_id).first()
+    
+    if user and id in user.session["next_movies"]:
+        print("Movie is in session, removing it...")
+        print("user_session before:", user.session["next_movies"])
+        user.session["next_movies"].remove(id)
+        print("Movie removed from session:", user.session["next_movies"])
+        
+        # Explicitly mark the session column as modified
+        attributes.flag_modified(user, "session")
+        
+        # Commit the changes
+        db.commit()
+        print("Session updated in DB:", user.session)
+    # Like movie by updating the user_movies table
+    user = db.query(postgers_models.User).filter(postgers_models.User.user_id == current_user.user_id).first()
+
+    # Ensure movie exists
+    movie = db.query(postgers_models.Movie).filter(postgers_models.Movie.movie_id == id).first()
+    if not movie:
+        print("Movie not found in the database. Fetching from external API...")
+        movie_profile = await parse_movie_to_movieProfile(current_user, db, id)
+        
+        movie = postgers_models.Movie(
+            movie_id=movie_profile["id"],
+            title=movie_profile["title"],
+            genres=[genre.dict() for genre in movie_profile["genres"]],
+            overview=movie_profile["overview"],
+            release_date=movie_profile["release_date"].strftime("%Y-%m-%d") if movie_profile["release_date"] else None,
+            vote_average=movie_profile["vote_average"],
+            vote_count=movie_profile["vote_count"],
+            runtime=movie_profile["runtime"],
+            tagline=movie_profile["tagline"],
+            keywords=movie_profile["keywords"],
+            poster_path=movie_profile["poster_path"],
+            backdrop_path=movie_profile["backdrop_path"],
+            images_path=movie_profile["images_path"],
+            watch_providers=movie_profile["watch_providers"],
+        )
+        db.add(movie)
+        db.commit()
+        db.refresh(movie)
+        print("Movie added to the database:", movie)
+    else:
+        print("Movie already exists in the database:", movie)
+
+    # Check if already liked
+    already_liked = db.execute(
+        postgers_models.user_movies.select().where(
+            (postgers_models.user_movies.c.user_id == user.user_id) &
+            (postgers_models.user_movies.c.movie_id == id)
+        )
+    ).first()
+    print("Checked if user liked the movie: ", already_liked)
+
+    if not already_liked:
+        print("In if")
+        db.execute(
+            postgers_models.user_movies.insert().values(
+                user_id=user.user_id,
+                movie_id=id,
+                liked_on=datetime.now()
+            )
+        )
+        db.commit()
+        print("After insert")
+    
+    return movie
+
+    # TODO: Update or create entry in the group_matches table

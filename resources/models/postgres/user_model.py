@@ -1,6 +1,8 @@
 from ...services.postgresql_service import Base
 from sqlalchemy.sql import func
 from datetime import datetime, timedelta
+from sqlalchemy.dialects.postgresql import JSONB
+from sqlalchemy.ext.mutable import MutableDict
 from sqlalchemy import (
     Column, Integer, String, DateTime, JSON, Boolean, CheckConstraint, Date
 )
@@ -105,7 +107,7 @@ class User(Base):
     last_login = Column(DateTime, nullable=True)
 
     # Metadata for algorithm
-    session = Column(JSON, nullable=False, default=default_session)
+    session = Column(MutableDict.as_mutable(JSONB), nullable=False, default=default_session)
 
     # Metadata about movie preferences
     show_movies = Column(Boolean, nullable=False, default=True)
