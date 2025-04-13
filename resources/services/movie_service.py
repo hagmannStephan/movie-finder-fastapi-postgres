@@ -125,7 +125,7 @@ async def parse_movie_to_movieProfile(
             "vote_count": movie_detailed.json().get("vote_count"),
             "runtime": movie_detailed.json().get("runtime"),
             "tagline": movie_detailed.json().get("tagline") or "",
-            "keywords": [kw["name"] for kw in movie_keywords.json().get("keywords", [])] or "",
+            "keywords": [kw["name"] for kw in movie_keywords.json().get("keywords", [])],
             "poster_path": movie_detailed.json().get("poster_path"),
             "backdrop_path": movie_detailed.json().get("backdrop_path") or "",
             "images_path": [img["file_path"] for img in movie_additional_images.json().get("backdrops", [])],
@@ -295,4 +295,50 @@ async def like_movie(
         
     return movie
 
-    # TODO: Update or create entry in the group_matches table
+async def dislike_movie(
+    current_user: schemas.User = Depends(get_current_user),
+    db: Session = Depends(get_db),
+    id: int = None
+):
+    # Get user directly from the database
+    user = db.query(postgers_models.User).filter(postgers_models.User.user_id == current_user.user_id).first()
+    
+    # Check if movie is in session, if yes - remove it
+    if user and id in user.session["next_movies"]:
+        user.session["next_movies"].remove(id)
+        
+        # Explicitly mark the session column as modified
+        from sqlalchemy.orm import attributes
+        attributes.flag_modified(user, "session")
+        
+        # Commit the changes
+        db.commit()
+    
+    # Ensure movie exists in database
+    movie = db.query(postgers_models.Movie).filter(postgers_models.Movie.movie_id == id).first()
+    
+    # If movie doesn't exist in our database, fetch it from external API
+    if not movie:
+        movie_profile = await parse_movie_to_movieProfile(current_user, db, id)
+        
+        movie = postgers_models.Movie(
+            movie_id=movie_profile["id"],
+            title=movie_profile["title"],
+            genres=[genre.dict() for genre in movie_profile["genres"]],
+            overview=movie_profile["overview"],
+            release_date=movie_profile["release_date"].strftime("%Y-%m-%d") if movie_profile["release_date"] else None,
+            vote_average=movie_profile["vote_average"],
+            vote_count=movie_profile["vote_count"],
+            runtime=movie_profile["runtime"],
+            tagline=movie_profile["tagline"],
+            keywords=movie_profile["keywords"],
+            poster_path=movie_profile["poster_path"],
+            backdrop_path=movie_profile["backdrop_path"],
+            images_path=movie_profile["images_path"],
+            watch_providers=movie_profile["watch_providers"],
+        )
+        db.add(movie)
+        db.commit()
+        db.refresh(movie)
+    
+    return movie
