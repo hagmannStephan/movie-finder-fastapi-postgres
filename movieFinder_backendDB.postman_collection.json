@@ -188,6 +188,20 @@
 				},
 				{
 					"name": "/{{$USER_ID}}/settings",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"exec": [
+									"pm.test(\"Status code is 200\", function () {\r",
+									"    pm.response.to.have.status(200);\r",
+									"});"
+								],
+								"type": "text/javascript",
+								"packages": {}
+							}
+						}
+					],
 					"request": {
 						"auth": {
 							"type": "bearer",
@@ -203,7 +217,7 @@
 						"header": [],
 						"body": {
 							"mode": "raw",
-							"raw": "{\r\n    \"show_movies\": \"True\",\r\n    \"show_tv\": \"True\",\r\n    \"include_adult\": \"False\",\r\n    \"language\": \"de-CH\",\r\n    \"watch_region\": \"DE\",\r\n    \"release_date_gte\": \"2024-02-02\",\r\n    \"release_date_lte\": \"2024-02-05\",\r\n    \"watch_providers\": [\r\n        \"netflix\", \"disneyplus\"\r\n    ],\r\n    \"with_genres\": [\r\n        \"action\"\r\n    ],\r\n    \"without_genres\": [\r\n        \"horror\"\r\n    ]\r\n}",
+							"raw": "{\r\n    \"show_movies\": false,\r\n    \"show_tv\": true,\r\n    \"settings_movies\": {\r\n        \"include_adult\": false,\r\n        \"language\": \"en-US\",\r\n        \"release_date\": {\r\n            \"gte\": \"1900-01-01\",\r\n            \"lte\": null\r\n        },\r\n        \"vote_avrage\": {\r\n            \"gte\": 0,\r\n            \"lte\": 10\r\n        },\r\n        \"watch_region\": null,\r\n        \"genres\": {\r\n            \"include\": [],\r\n            \"exclude\": []\r\n        },\r\n        \"with_runtime\": {\r\n            \"gte\": 0,\r\n            \"lte\": 300\r\n        },\r\n        \"watch_providers\": []\r\n    },\r\n    \"settings_tv\": {\r\n        \"include_adult\": false,\r\n        \"language\": \"en-US\",\r\n        \"first_air_date\": {\r\n            \"gte\": \"1900-01-01\",\r\n            \"lte\": null\r\n        },\r\n        \"vote_avrage\": {\r\n            \"gte\": 0,\r\n            \"lte\": 10\r\n        },\r\n        \"watch_region\": null,\r\n        \"genres\": {\r\n            \"include\": [],\r\n            \"exclude\": []\r\n        },\r\n        \"watch_providers\": []\r\n    }\r\n}",
 							"options": {
 								"raw": {
 									"language": "json"
@@ -549,7 +563,7 @@
 						"header": [],
 						"body": {
 							"mode": "raw",
-							"raw": "{\r\n    \"name\": \"Movie Buffs Extreme\",\r\n    \"group_id\": 1,\r\n    \"created_on\": \"2024-10-05\",\r\n    \"admin_id\": 1,\r\n    \"show_movies\": true,\r\n    \"show_tv\": false,\r\n    \"include_adult\": false,\r\n    \"language\": \"en-US\",\r\n    \"release_date_gte\": \"1970-01-01\",\r\n    \"release_date_lte\": \"2025-03-11\",\r\n    \"watch_region\": \"CH\",\r\n    \"watch_providers\": [],\r\n    \"with_genres\": [\r\n        28,\r\n        12,\r\n        16\r\n    ],\r\n    \"without_genres\": [\r\n        27\r\n    ],\r\n    \"members\": [\r\n        1,\r\n        3,\r\n        4\r\n    ]\r\n}",
+							"raw": "{\r\n    \"name\": \"myNiceGroup\",\r\n    \"admin_id\": 1,\r\n    \"show_movies\": true,\r\n    \"show_tv\": true,\r\n    \"settings_movies\": {\r\n        \"include_adult\": false,\r\n        \"language\": \"en-US\",\r\n        \"release_date\": {\r\n            \"gte\": \"1900-01-01\",\r\n            \"lte\": null\r\n        },\r\n        \"vote_avrage\": {\r\n            \"gte\": 0,\r\n            \"lte\": 10\r\n        },\r\n        \"watch_region\": null,\r\n        \"genres\": {\r\n            \"include\": [],\r\n            \"exclude\": []\r\n        },\r\n        \"with_runtime\": {\r\n            \"gte\": 0,\r\n            \"lte\": 300\r\n        },\r\n        \"watch_providers\": [1, 2, 4]\r\n    },\r\n    \"settings_tv\": {\r\n        \"include_adult\": false,\r\n        \"language\": \"en-US\",\r\n        \"first_air_date\": {\r\n            \"gte\": \"1900-01-01\",\r\n            \"lte\": null\r\n        },\r\n        \"vote_avrage\": {\r\n            \"gte\": 0,\r\n            \"lte\": 10\r\n        },\r\n        \"watch_region\": null,\r\n        \"genres\": {\r\n            \"include\": [],\r\n            \"exclude\": []\r\n        },\r\n        \"watch_providers\": []\r\n    }\r\n}",
 							"options": {
 								"raw": {
 									"language": "json"
@@ -713,6 +727,20 @@
 				},
 				{
 					"name": "/{{$GROUP_ID}}/matches",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"exec": [
+									"pm.test(\"Status code is 200\", function () {\r",
+									"    pm.response.to.have.status(200);\r",
+									"});"
+								],
+								"type": "text/javascript",
+								"packages": {}
+							}
+						}
+					],
 					"request": {
 						"auth": {
 							"type": "bearer",
@@ -743,6 +771,178 @@
 				}
 			],
 			"description": "/groups endpoints"
+		},
+		{
+			"name": "movie",
+			"item": [
+				{
+					"name": "/genres",
+					"request": {
+						"auth": {
+							"type": "bearer",
+							"bearer": [
+								{
+									"key": "token",
+									"value": "{{$ACCESS_TOKEN}}",
+									"type": "string"
+								}
+							]
+						},
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "http://{{$BASE_URL}}/movies/genres",
+							"protocol": "http",
+							"host": [
+								"{{$BASE_URL}}"
+							],
+							"path": [
+								"movies",
+								"genres"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "/random",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"exec": [
+									"pm.test(\"Status code is 200\", function () {\r",
+									"    pm.response.to.have.status(200);\r",
+									"});"
+								],
+								"type": "text/javascript",
+								"packages": {}
+							}
+						}
+					],
+					"request": {
+						"auth": {
+							"type": "bearer",
+							"bearer": [
+								{
+									"key": "token",
+									"value": "{{$ACCESS_TOKEN}}",
+									"type": "string"
+								}
+							]
+						},
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "http://{{$BASE_URL}}/movies/random",
+							"protocol": "http",
+							"host": [
+								"{{$BASE_URL}}"
+							],
+							"path": [
+								"movies",
+								"random"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "/{{$MOVIE_ID}}/right-swipe",
+					"request": {
+						"auth": {
+							"type": "bearer",
+							"bearer": [
+								{
+									"key": "token",
+									"value": "{{$ACCESS_TOKEN}}",
+									"type": "string"
+								}
+							]
+						},
+						"method": "POST",
+						"header": [],
+						"url": {
+							"raw": "http://{{$BASE_URL}}/movies/{{$MOVIE_ID}}/right-swipe",
+							"protocol": "http",
+							"host": [
+								"{{$BASE_URL}}"
+							],
+							"path": [
+								"movies",
+								"{{$MOVIE_ID}}",
+								"right-swipe"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "/{{$MOVIE_ID}}/left-swipe",
+					"request": {
+						"auth": {
+							"type": "bearer",
+							"bearer": [
+								{
+									"key": "token",
+									"value": "{{$ACCESS_TOKEN}}",
+									"type": "string"
+								}
+							]
+						},
+						"method": "POST",
+						"header": [],
+						"url": {
+							"raw": "http://{{$BASE_URL}}/movies/{{$MOVIE_ID}}/left-swipe",
+							"protocol": "http",
+							"host": [
+								"{{$BASE_URL}}"
+							],
+							"path": [
+								"movies",
+								"{{$MOVIE_ID}}",
+								"left-swipe"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "/search?keywords={{$KEYWORDS}}",
+					"request": {
+						"auth": {
+							"type": "bearer",
+							"bearer": [
+								{
+									"key": "token",
+									"value": "{{$ACCESS_TOKEN}}",
+									"type": "string"
+								}
+							]
+						},
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "http://{{$BASE_URL}}/movies/search?keywords={{$KEYWORDS}}",
+							"protocol": "http",
+							"host": [
+								"{{$BASE_URL}}"
+							],
+							"path": [
+								"movies",
+								"search"
+							],
+							"query": [
+								{
+									"key": "keywords",
+									"value": "{{$KEYWORDS}}"
+								}
+							]
+						}
+					},
+					"response": []
+				}
+			]
 		},
 		{
 			"name": "/",

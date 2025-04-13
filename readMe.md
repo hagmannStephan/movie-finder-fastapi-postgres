@@ -59,3 +59,7 @@ To execute the requests in Postman, you need to create an Environment with the f
 </a>
 
 **This app uses [TMDB](https://www.themoviedb.org/) and the [TMDB APIs](https://developer.themoviedb.org/docs/getting-started) but is not endorsed, certified, or otherwise approved by TMDB.**
+Some data, including streaming availability, is provided by JustWatch. Attribution is required by TMDB.
+
+# Disclaimer
+If you plan to use the hosted version of the Movie Finder Backend, you must include proper attribution to TMDB and JustWatch in your application. Failure to do so may result in revoked access to the project, in accordance with TMDB's API usage terms.

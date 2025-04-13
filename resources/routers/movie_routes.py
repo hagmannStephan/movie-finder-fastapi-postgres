@@ -105,8 +105,8 @@ async def dislike_movie(current_user: schemas.User = Depends(get_current_user), 
     description="Search for movies by keywords (seperated by whitespace)",
     responses={
         "200": {"description": "Movies found"},
-        "400": {"description": "Bad Request"},
         "422": {"description": "Unprocessable Entity"},
+        "429": {"description": "Rate limit exceeded after maximum retries"},
         "500": {"description": "Internal server error"}
     }
 )
@@ -116,7 +116,11 @@ async def search_movies(keywords: str, current_user: schemas.User = Depends(get_
             raise HTTPException(status_code=400, detail="Keywords query parameter is required")
         return await movie_service.search_movies(keywords, db)
     except Exception as e:
+        if str(e) == "Rate limit exceeded after maximum retries":
+            raise HTTPException(status_code=429, detail="Rate limit exceeded after maximum retries")
         raise HTTPException(status_code=500, detail="Internal server error")
+    
+
 
 # --------------------------------------------------------------------------------------------
 # TODO: Implement these endpoints
