@@ -138,6 +138,25 @@ async def get_watch_providers(current_user: schemas.User = Depends(get_current_u
         if str(e) == "Rate limit exceeded after maximum retries":
             raise HTTPException(status_code=429, detail="Rate limit exceeded after maximum retries")
         raise HTTPException(status_code=500, detail="Internal server error")
+    
+@router.get(
+    "/watch-providers/popular",
+    response_model=list[schemas.WatchProvider],
+    description="Get a list of the most popular watch providers",
+    responses={
+        "200": {"description": "Popular watch providers found"},
+        "422": {"description": "Unprocessable Entity"},
+        "429": {"description": "Rate limit exceeded after maximum retries"},
+        "500": {"description": "Internal server error"}
+    }
+)
+async def get_popular_watch_providers(current_user: schemas.User = Depends(get_current_user), db: Session = Depends(get_db)):
+    try:
+        return await movie_service.get_popular_watch_providers(db)
+    except Exception as e:
+        if str(e) == "Rate limit exceeded after maximum retries":
+            raise HTTPException(status_code=429, detail="Rate limit exceeded after maximum retries")
+        raise HTTPException(status_code=500, detail="Internal server error")
 
 # --------------------------------------------------------------------------------------------
 # TODO: Implement these endpoints

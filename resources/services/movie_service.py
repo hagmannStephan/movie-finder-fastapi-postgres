@@ -410,3 +410,23 @@ async def get_watch_providers(
         cache = cache_service.get_cache("watch_providers", db)
 
         return cache.value.get("watch_providers")
+    
+async def get_popular_watch_providers(
+        db: Session = Depends(get_db)
+):
+    all_providers = await get_watch_providers(db)
+
+    # Netflix (id: 8)
+    # Amazon Prime Video (id: 119)
+    # Disney Plus (id: 337)
+    # blue TV (id: 150)
+    # Apple TV (id: 2)
+    # Play Suisse (id: 691)
+    popular_provider_ids = {8, 119, 337, 150, 2, 691}
+
+    filtered_providers = [
+        provider for provider in all_providers
+        if provider.get("provider_id") in popular_provider_ids
+    ]
+
+    return filtered_providers
