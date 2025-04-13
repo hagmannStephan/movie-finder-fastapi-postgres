@@ -1,6 +1,7 @@
 from sqlalchemy.orm import Session
 from fastapi import Depends
 from resources.services.postgresql_service import get_db
+import json
 import resources.models.postgres as postgers_models
 import resources.schemas as schemas
 
@@ -67,9 +68,7 @@ def update_group(
     if not group:
         raise Exception("Group not found")
     
-    if (group.admin_id != original_group.admin_id and current_user.user_id != original_group.admin_id 
-        or original_group.group_id != group.group_id
-        or original_group.created_on != group.created_on):
+    if (group.admin_id != original_group.admin_id and current_user.user_id != original_group.admin_id):
         raise Exception("User not authorized")
     
     for key, value in original_group.dict().items():
@@ -168,9 +167,33 @@ def get_group_matches(
 
     for match in matches:
         movie = db.query(postgers_models.Movie).filter(postgers_models.Movie.movie_id == match.movie_id).first()
+        
+        if not movie:
+            continue
+
+        movie_profile = schemas.MovieProfile(
+            id=movie.movie_id,
+            title=movie.title or "",
+            genres = [
+                schemas.Genre(name=g) if isinstance(g, str) else schemas.Genre(name=g.get('name', ''), id=g.get('id', 0))
+                for g in movie.genres
+            ] if movie.genres else [],
+            overview=movie.overview or "",
+            release_date=movie.release_date or "",
+            vote_average=movie.vote_average or 0.0,
+            vote_count=movie.vote_count or 0,
+            runtime=movie.runtime or 0,
+            tagline=movie.tagline or "",
+            keywords=movie.keywords or [],
+            poster_path=movie.poster_path or "",
+            backdrop_path=movie.backdrop_path or "",
+            images_path=movie.images_path or []
+        )
+
+        # Create the match dictionary
         match_dict = schemas.GroupMatch(
-            **{key: value for key, value in match._asdict().items() if key != 'movie_id'},
-            movie=movie
+            **match._asdict(),
+            movie=movie_profile
         )
         match_dicts.append(match_dict)
 

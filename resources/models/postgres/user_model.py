@@ -1,9 +1,100 @@
 from ...services.postgresql_service import Base
 from sqlalchemy.sql import func
-import json
+from datetime import datetime, timedelta
+from sqlalchemy.dialects.postgresql import JSONB
+from sqlalchemy.ext.mutable import MutableDict
 from sqlalchemy import (
     Column, Integer, String, DateTime, JSON, Boolean, CheckConstraint, Date
 )
+
+
+def default_session():
+    return {
+        "next_movies": [],
+        "metadata_query": {
+            "discover": {
+                "movies": {
+                    "popularity_desc": {
+                        "page": 1,
+                        "vote_count_gte": 1000,
+                        "vote_avrage_gte": 6,
+                        "vote_count_lte": None,
+                        "vote_avrage_lte": None
+                    },
+                    "primary_release_date_desc": {
+                        "release_date_gte": (datetime.now() - timedelta(days=60)).strftime('%Y-%m-%d'),
+                        "vote_count_gte": 50,
+                        "vote_avrage_gte": 5
+                    }
+                },
+                "tv": {
+                    "popularity_desc": {
+                        "page": 1,
+                        "vote_count_gte": 1000,
+                        "vote_avrage_gte": 6,
+                        "vote_count_lte": None,
+                        "vote_avrage_lte": None
+                    },
+                    "first_air_date_desc": {
+                        "first_air_date_gte": (datetime.now() - timedelta(days=60)).strftime('%Y-%m-%d'),
+                        "vote_count_gte": 50,
+                        "vote_avrage_gte": 5
+                    }
+                }
+            },
+            "group_matches": {
+                "last_query": datetime.now().strftime('%Y-%m-%d %H:%M:%S')
+            },
+            "similar": {
+                "last_query": datetime.now().strftime('%Y-%m-%d %H:%M:%S')
+            }
+        }
+    }
+
+def default_settings_movies():
+    return {
+        "include_adult": False,
+        "language": "en-US",
+        "release_date": {
+            "gte": "1900-01-01",
+            "lte": None
+        },
+        "vote_average": {
+            "gte": 0,
+            "lte": 10
+        },
+        "watch_region": None,
+        "genres": {
+            "include": [],
+            "exclude": []
+        },
+        "with_runtime": {
+            "gte": 0,
+            "lte": 300
+        },
+        "watch_providers": []
+    }
+
+def default_settings_tv():
+    return {
+        "include_adult": False,
+        "language": "en-US",
+        "first_air_date": {
+            "gte": "1900-01-01",
+            "lte": None
+        },
+        "vote_average": {
+            "gte": 0,
+            "lte": 10
+        },
+        "watch_region": None,
+        "genres": {
+            "include": [],
+            "exclude": []
+        },
+        "watch_providers": [],
+    }
+
 
 class User(Base):
     __tablename__ = "users"
@@ -15,24 +106,15 @@ class User(Base):
     created_on = Column(DateTime, nullable=False, server_default=func.now())
     last_login = Column(DateTime, nullable=True)
 
-    # Metadata for alogrithm
-    movie_session = Column(JSON, nullable=True)
-    page = Column(Integer, nullable=False, default=1)
-    latest_movie_date = Column(Date, nullable=True)
+    # Metadata for algorithm
+    session = Column(MutableDict.as_mutable(JSONB), nullable=False, default=default_session)
 
     # Metadata about movie preferences
     show_movies = Column(Boolean, nullable=False, default=True)
     show_tv = Column(Boolean, nullable=False, default=True)
-    include_adult = Column(Boolean, nullable=False, default=False)
-    language = Column(String(10), nullable=False, default='en-US')
-    release_date_gte = Column(Date, nullable=True, default='1900-01-01')
-    release_date_lte = Column(Date, nullable=True, server_default=func.now())
-    watch_region = Column(String(10), nullable=True, default='CH')
 
-    watch_providers = Column(JSON, nullable=True, default=lambda: json.dumps([]))        # TODO: Sync with watch providers from groups
-    with_genres = Column(JSON, nullable=True, default=lambda: json.dumps([]))
-    without_genres = Column(JSON, nullable=True, default=lambda: json.dumps([]))
-    
+    settings_movies = Column(JSON, nullable=False, default=default_settings_movies)
+    settings_tv = Column(JSON, nullable=False, default=default_settings_tv)
 
     __table_args__ = (
         CheckConstraint('users.show_movies = true OR users.show_tv = true', name='check_at_least_one_true'),

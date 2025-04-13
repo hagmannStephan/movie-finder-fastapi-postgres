@@ -62,7 +62,7 @@ def get_group(id: int, current_user: schemas.User = Depends(get_current_user), d
         "500": {"description": "Internal server error"}
     }
 )
-def update_group(id: int, group: schemas.Group, current_user: schemas.User = Depends(get_current_user), db: Session = Depends(get_db)):
+def update_group(id: int, group: schemas.GroupUpdate, current_user: schemas.User = Depends(get_current_user), db: Session = Depends(get_db)):
     try:
         return group_service.update_group(id, group, current_user, db)
     except Exception as e:

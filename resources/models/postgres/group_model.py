@@ -2,6 +2,7 @@ from ...services.postgresql_service import Base
 from sqlalchemy import (
     Column, Integer, String, Date, JSON, Boolean, CheckConstraint, ForeignKey
 )
+import json
 
 class Group(Base):
     __tablename__ = "groups"
@@ -13,15 +14,49 @@ class Group(Base):
     # Metadata about movie preferences
     show_movies = Column(Boolean, nullable=False, default=True)
     show_tv = Column(Boolean, nullable=False, default=True)
-    include_adult = Column(Boolean, nullable=False, default=False)
-    language = Column(String(10), nullable=False, default='en-US')
-    release_date_gte = Column(Date, nullable=True, default='1900-01-01')
-    release_date_lte = Column(Date, nullable=True, default='now()')
-    watch_region = Column(String(10), nullable=True, default='CH')
-    watch_providers = Column(JSON, nullable=True, default=list)
-    with_genres = Column(JSON, nullable=True, default=list)
-    without_genres = Column(JSON, nullable=True, default=list)
-    
+
+    settings_movies = Column(JSON, nullable=False, default=lambda: json.dumps({
+        "include_adult": False,
+        "language": "en-US",
+        "release_date": {
+            "gte": "1900-01-01",
+            "lte": None
+        },
+        "vote_average": {
+            "gte": 0,
+            "lte": 10
+        },
+        "watch_region": None,
+        "genres": {
+            "include": [],
+            "exclude": []
+        },
+        "with_runtime": {
+            "gte": 0,
+            "lte": 300
+        },
+        "watch_providers": []
+    }))
+
+    settings_tv = Column(JSON, nullable=False, default=lambda: json.dumps({
+        "include_adult": False,
+        "language": "en-US",
+        "first_air_date": {
+            "gte": "1900-01-01",
+            "lte": None
+        },
+        "vote_average": {
+            "gte": 0,
+            "lte": 10
+        },
+        "watch_region": None,
+        "genres": {
+            "include": [],
+            "exclude": []
+        },
+        "watch_providers": [],
+    }))
+
 
     __table_args__ = (
         CheckConstraint('groups.show_movies = true OR groups.show_tv = true', name='check_at_least_one_true'),

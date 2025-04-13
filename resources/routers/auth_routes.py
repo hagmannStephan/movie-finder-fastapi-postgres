@@ -3,7 +3,7 @@ from sqlalchemy.orm import Session
 from datetime import timedelta
 from resources.services.postgresql_service import get_db
 from resources.services.auth_service import (
-    verify_password, get_user_by_email,
+    verify_password, get_user_by_email, update_user_last_login,
     create_access_token, create_refresh_token
 )
 from jose import jwt, JWTError
@@ -40,6 +40,7 @@ async def login_for_access_token(
     db: Session = Depends(get_db)
 ):
     user = get_user_by_email(db, email)
+    
     if not user or not verify_password(password, user.password):
         raise HTTPException(
             status_code=status.HTTP_401_UNAUTHORIZED,
@@ -47,6 +48,8 @@ async def login_for_access_token(
             headers={"WWW-Authenticate": "Bearer"},
         )
     
+    update_user_last_login(db, user)
+
     # Create tokens
     access_token_expires = timedelta(minutes=ACCESS_TOKEN_EXPIRE_MINUTES)
     access_token = create_access_token(
@@ -92,6 +95,8 @@ async def refresh_token(refresh_token: str = Form(...), db: Session = Depends(ge
         user = get_user_by_email(db, email)
         if user is None:
             raise credentials_exception
+        
+        update_user_last_login(db, user)
             
         # Create new tokens
         access_token_expires = timedelta(minutes=ACCESS_TOKEN_EXPIRE_MINUTES)

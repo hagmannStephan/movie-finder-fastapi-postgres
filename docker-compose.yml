@@ -26,13 +26,14 @@ services:
       - postgres-data:/var/lib/postgresql/data
     env_file:
       - .env
+    command: postgres -c shared_preload_libraries=pg_cron -c cron.database_name=movieFinder-DB    # Ensure that it matches the database name in the .env file
     networks:
       - dev-network
     ports:
       - "127.0.0.1:5432:5432"   # Ensure that it matches the port in the .env file
     healthcheck:
-      test: ["CMD", "pg_isready", "-U", "postgres-backend"]   # Ensure that it matches the user in the .env file
-      interval: 10s
+      test: ["CMD", "pg_isready", "-U", "postgres-backend", "-d", "movieFinder-DB"]   # Ensure that it matches the user and database in the .env file
+      interval: 30s
       timeout: 5s
       retries: 5
 

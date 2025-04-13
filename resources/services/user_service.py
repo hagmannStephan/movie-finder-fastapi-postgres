@@ -7,7 +7,13 @@ import resources.schemas as schemas
 from sqlalchemy.sql import func
 from . import group_service
 import secrets
+import json
+from fastapi import Depends, HTTPException
+from sqlalchemy.orm import Session
+from typing import List
+import logging
 
+logger = logging.getLogger(__name__)
 
 def create_user(
         user: schemas.UserCreate,
@@ -42,25 +48,38 @@ def create_user(
 
 
 def get_user_favourites(
-        id: int,
-        db: Session = Depends(get_db),
-) -> list[schemas.Movie]:
-    favourite_movies = (
-        db.query(postgers_models.Movie)
-        .join(postgers_models.user_movies)
-        .filter(postgers_models.user_movies.c.user_id == id)
-        .all()
-    )
-    return favourite_movies
+    id: int,
+    db: Session = Depends(get_db),
+) -> List[schemas.MovieFavourites]:
+    try:
+        favourite_movies = (
+            db.query(postgers_models.Movie)
+            .join(postgers_models.user_movies)
+            .filter(postgers_models.user_movies.c.user_id == id)
+            .all()
+        )
+
+        if not favourite_movies:
+            logger.info(f"No favourite movies found for user with id {id}")
+            raise HTTPException(status_code=404, detail="No favourite movies found for this user.")
+
+        return [schemas.MovieFavourites.from_orm(movie) for movie in favourite_movies]
+
+    except HTTPException:
+        raise  # re-raise to avoid catching it in the generic exception block
+
+    except Exception as e:
+        logger.error(f"Unexpected error while fetching favourites for user {id}: {e}")
+        raise HTTPException(status_code=500, detail="Internal server error fetching favourite movies.")
 
 def remove_user_favourite(
         id: int,
         movie_id: int,
         db: Session = Depends(get_db)
-) -> schemas.Movie:
+) -> schemas.MovieFavourites:
     user_favourites = get_user_favourites(id, db)
     for movie in user_favourites:
-        if movie.movie_id == movie_id:
+        if movie.id == movie_id:
             db.query(postgers_models.user_movies).filter(
                 postgers_models.user_movies.c.user_id == id,
                 postgers_models.user_movies.c.movie_id == movie_id
@@ -76,8 +95,23 @@ def update_user_settings(
         db: Session = Depends(get_db)
 ) -> schemas.UserPatchSettings:
     user = db.query(postgers_models.User).filter(postgers_models.User.user_id == id).first()
+
+    settings_movies = settings.settings_movies
+    if isinstance(settings_movies, str):
+        settings_movies = json.loads(settings_movies)
+
+    settings_tv = settings.settings_tv
+    if isinstance(settings_tv, str):
+        settings_tv = json.loads(settings_tv)
+    
     for key, value in settings.dict().items():
-        setattr(user, key, value)
+        if key == "settings_movies":
+            setattr(user, key, settings_movies)
+        elif key == "settings_tv":
+            setattr(user, key, settings_tv)
+        else:
+            setattr(user, key, value)
+
     db.commit()
     return settings
     
