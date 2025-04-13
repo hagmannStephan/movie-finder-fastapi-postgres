@@ -33,7 +33,7 @@ async def get_with_retry(client, url, headers, retries=0):
         # 429 means that to many requests were made
         if response.status_code == 429:
             if retries >= MAX_RETRIES:
-                raise Exception(status_code=429, detail="Rate limit exceeded after maximum retries")
+                raise HTTPException(status_code=429, detail="Rate limit exceeded after maximum retries")
                 
             # Calculate backoff with jitter to avoid synchronized retries
             delay = (BASE_DELAY ** retries) + (random.random() * 0.5)
@@ -47,7 +47,8 @@ async def get_with_retry(client, url, headers, retries=0):
         return response
         
     except httpx.HTTPStatusError as e:
-        raise Exception(status_code=e.response.status_code, detail=str(e))
+        raise HTTPException(status_code=e.response.status_code, detail=str(e))
+
 
 
 async def get_movie_genres(
@@ -132,6 +133,10 @@ async def parse_movie_to_movieProfile(
             "watch_providers": movie_watch_providers.json().get("results", {}).get("CH", {})
         }
     
+def save_movie_to_db():
+    # TODO: Implement this function to make code for like and dislike less redundant
+    pass
+
 def get_user_session(
     current_user: schemas.User,
     db: Session
@@ -342,3 +347,31 @@ async def dislike_movie(
         db.refresh(movie)
     
     return movie
+
+async def search_movies(
+    keywords: str,
+    current_user: schemas.User = Depends(get_current_user),
+    db: Session = Depends(get_db)
+):
+    url = f"{BASE_URL}/search/multi?query={keywords}&include_adult=false&language=en-US&page=1"
+
+    async with httpx.AsyncClient() as client:
+        response = await get_with_retry(client, url, headers)
+
+        # Filter for only movie types
+        results = response.json().get("results", [])
+        # filtered = [item for item in results if item.get("media_type") == {"movie", "tv"}]
+        filtered = [item for item in results if item.get("media_type") == "movie"]
+
+        # Parse each movie to MovieProfile
+        profiles = []
+        for item in filtered:
+            movie_id = item.get("id")
+            profile = await parse_movie_to_movieProfile(
+                current_user=current_user,
+                db=db,
+                movie_id=movie_id
+            )
+            profiles.append(profile)
+
+        return profiles

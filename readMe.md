@@ -50,6 +50,7 @@ To execute the requests in Postman, you need to create an Environment with the f
 - `$GROUP_ID` (you can set this based on the action you want to perform)
 - `$FRIENDSHIP_CODE` (you can set this based on the action you want to perform)
 - `$MEMBER_ID` (you can set this based on the action you want to perform)
+- `$KEYWORDS` (you can set this based on the action you want to perform)
 
 
 # Attribution
