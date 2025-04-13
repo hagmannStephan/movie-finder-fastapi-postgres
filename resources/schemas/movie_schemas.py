@@ -38,3 +38,8 @@ class MovieFavourites(BaseMovie):
 
 class MovieProfile(BaseMovie):
     id: Optional[int] = None
+
+class WatchProvider(BaseModel):
+    provider_id: int
+    provider_name: str
+    logo_path: Optional[str] = None

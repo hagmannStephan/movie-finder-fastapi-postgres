@@ -375,3 +375,38 @@ async def search_movies(
             profiles.append(profile)
 
         return profiles
+
+async def get_watch_providers(
+        db: Session = Depends(get_db)
+):
+    cache = cache_service.get_cache("watch_providers", db)
+
+    # Only return the cache if it was updated within the last week
+    if cache:
+        updated_at = cache.updated_at
+        if updated_at > datetime.now() - timedelta(weeks=1):
+            return cache.value.get("watch_providers")
+        
+    async with httpx.AsyncClient() as client:
+        watch_providers = await get_with_retry(
+            client,
+            f"{BASE_URL}/watch/providers/movie?language=en-US&watch_region=CH",
+            headers
+        )
+        
+        parsed_providers = [
+            {
+            "provider_id": provider.get("provider_id"),
+            "provider_name": provider.get("provider_name"),
+            "logo_path": provider.get("logo_path")
+            }
+            for provider in watch_providers.json().get("results", [])
+        ]
+
+        cache_service.update_cache("watch_providers", {
+            "watch_providers": parsed_providers
+        }, db)
+
+        cache = cache_service.get_cache("watch_providers", db)
+
+        return cache.value.get("watch_providers")
