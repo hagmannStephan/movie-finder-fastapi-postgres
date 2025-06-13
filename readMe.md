@@ -1,4 +1,4 @@
-# Movie Finder - Backend
+# Movie Finder - Backend Documentation
 You can find the official API documentation, created with Swagger, under the following URL: [api.moviefinder.stephanhagmann.ch/docs](https://api.moviefinder.stephanhagmann.ch/docs)
 ## Development - Cheat Sheet
 ### Run the project
