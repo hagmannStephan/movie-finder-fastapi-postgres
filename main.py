@@ -1,4 +1,5 @@
 from fastapi import FastAPI
+from fastapi.middleware.cors import CORSMiddleware
 from resources.services.postgresql_service import engine
 from resources.services.postgresql_service import Base
 import resources.routers as routers
@@ -19,8 +20,15 @@ Some data, including streaming availability, is provided by JustWatch. Attributi
     version="0.1.0"
 )
 
-Base.metadata.create_all(bind=engine)
+app.add_middleware(
+    CORSMiddleware,
+    allow_origins=["*"],
+    allow_credentials=True,
+    allow_methods=["*"],
+    allow_headers=["*"],
+)
 
+Base.metadata.create_all(bind=engine)
 
 @app.get("/", tags=["Root"])
 def read_root():
