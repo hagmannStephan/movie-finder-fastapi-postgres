@@ -1,14 +1,11 @@
 name: Deploy MovieFinder Backend
-
 # Define when the workflow will run
 on:
   push:
     branches: [ main ]
-
 # Define permissions for GITHUB_TOKEN
 permissions:
   contents: read
-
 jobs:
   # Define name of job
   deploy:
@@ -23,13 +20,11 @@ jobs:
         uses: webfactory/ssh-agent@v0.7.0
         with:
           ssh-private-key: ${{ secrets.SSH_PRIVATE_KEY }}
-
       # Add host to know host to avoid issues on connection
       - name: Add server to known hosts
         run: |
           mkdir -p ~/.ssh
           ssh-keyscan -H ${{ secrets.SERVER_IP }} >> ~/.ssh/known_hosts
-
       # Create .env file on server from GitHub Secrets
       - name: Create .env file on server
         env:
@@ -39,7 +34,16 @@ jobs:
           ENV_FILE_CONTENT: ${{ secrets.ENV_FILE_CONTENT }}
         run: |
           ssh $SERVER_USER@$SERVER_IP "cd $SERVER_PATH && echo '$ENV_FILE_CONTENT' > .env"
-
+      # Login to Docker Hub on server
+      - name: Login to Docker Hub on server
+        env:
+          SERVER_IP: ${{ secrets.SERVER_IP }}
+          SERVER_USER: ${{ secrets.SERVER_USER }}
+          SERVER_PATH: ${{ secrets.SERVER_PATH }}
+          DOCKER_USERNAME: ${{ secrets.DOCKER_USERNAME }}
+          DOCKER_PASSWORD: ${{ secrets.DOCKER_PASSWORD }}
+        run: |
+          ssh $SERVER_USER@$SERVER_IP "echo '$DOCKER_PASSWORD' | docker login -u '$DOCKER_USERNAME' --password-stdin"
       # Deploy to server
       - name: Deploy to server
         env:
@@ -51,5 +55,3 @@ jobs:
           git pull origin main && \
           docker-compose down -v --remove-orphans && \
           docker-compose up -d --build"
-
-
