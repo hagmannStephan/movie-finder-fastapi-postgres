@@ -26,23 +26,28 @@ router = APIRouter(
 )
 
 @router.get(
-        "/random",
-        response_model=schemas.MovieProfile,
-        description="Get a random movie",
-        responses={
-            "200": {"description": "Random movie found"},
-            "429": {"description": "Rate limit exceeded after maximum retries"},
-            "500": {"description": "Internal server error"}
-        }
+    "/random",
+    response_model=schemas.MovieProfile,
+    description="Get a random movie",
+    responses={
+        200: {"description": "Random movie found"},
+        429: {"description": "Rate limit exceeded after maximum retries"},
+        500: {"description": "Internal server error"}
+    }
 )
-async def get_random_movie(current_user: schemas.User = Depends(get_current_user), db: Session = Depends(get_db)):
+async def get_random_movie(
+    current_user: schemas.User = Depends(get_current_user),
+    db: Session = Depends(get_db)
+):
     try:
         return await movie_service.get_random_movie(current_user, db)
     except Exception as e:
+        import traceback
+        traceback.print_exc()
         if str(e) == "Rate limit exceeded after maximum retries":
-            raise HTTPException(status_code=429, detail="Rate limit exceeded after maximum retries")
-        print(e)
-        raise HTTPException(status_code=500, detail="Internal server error")
+            raise HTTPException(status_code=429, detail=str(e))
+        raise HTTPException(status_code=500, detail=f"Internal server error: {e}")
+
 
 @router.get(
     "/genres",

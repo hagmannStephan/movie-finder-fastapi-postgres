@@ -49,5 +49,7 @@ jobs:
         run: |
           ssh $SERVER_USER@$SERVER_IP "cd $SERVER_PATH && \
           git pull origin main && \
-          docker-compose down && \
-          docker-compose up -d --build"
+          docker-compose down -v --remove-orphans && \
+          docker system prune -a -f && \
+          docker-compose up -d --build
+

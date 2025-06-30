@@ -3,8 +3,10 @@ from fastapi.middleware.cors import CORSMiddleware
 from resources.services.postgresql_service import engine
 from resources.services.postgresql_service import Base
 import resources.routers as routers
+from fastapi import Request
+from fastapi.responses import JSONResponse
+import traceback
 
- 
 app = FastAPI(
     title="Movie Finder - Backend",
     description="""
@@ -27,6 +29,15 @@ app.add_middleware(
     allow_methods=["*"],
     allow_headers=["*"],
 )
+
+@app.exception_handler(Exception)
+async def global_exception_handler(request: Request, exc: Exception):
+    tb = traceback.format_exc()
+    print(f"🔥 Unhandled Exception: {tb}")
+    return JSONResponse(
+        status_code=500,
+        content={"detail": str(exc)},
+    )
 
 Base.metadata.create_all(bind=engine)
 
