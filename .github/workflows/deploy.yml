@@ -51,5 +51,6 @@ jobs:
           git pull origin main && \
           docker-compose down -v --remove-orphans && \
           docker system prune -a -f && \
-          docker-compose up -d --build
+          docker-compose up -d --build"
+
 
