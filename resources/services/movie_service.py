@@ -114,8 +114,13 @@ async def parse_movie_to_movieProfile(
             f"{BASE_URL}/movie/{movie_id}/watch/providers",
             headers
         )
-        movie_detailed, movie_keywords, movie_additional_images, movie_watch_providers = await asyncio.gather(movie_detailed, movie_keywords, movie_additional_images, movie_watch_providers)
-
+        movie_detailed, movie_keywords, movie_additional_images, movie_watch_providers = await asyncio.gather(
+            movie_detailed, 
+            movie_keywords, 
+            movie_additional_images, 
+            movie_watch_providers
+        )
+        
         return {
             "id": movie_detailed.json().get("id"),
             "title": movie_detailed.json().get("title"),
@@ -176,8 +181,8 @@ async def get_random_movie(
 
         for movie in movies_by_popularity.json().get("results", []):
             session["next_movies"].append(movie.get("id"))
-            update_user_session(session, current_user, db)
-            id = movies_by_popularity.json().get("results")[0].get("id")
+        update_user_session(session, current_user, db)
+        id = movies_by_popularity.json().get("results")[0].get("id")
               
     else:
         id = session["next_movies"][0]
