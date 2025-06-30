@@ -157,9 +157,3 @@ async def get_popular_watch_providers(current_user: schemas.User = Depends(get_c
         if str(e) == "Rate limit exceeded after maximum retries":
             raise HTTPException(status_code=429, detail="Rate limit exceeded after maximum retries")
         raise HTTPException(status_code=500, detail="Internal server error")
-
-# --------------------------------------------------------------------------------------------
-# TODO: Implement these endpoints
-# --------------------------------------------------------------------------------------------
-# GET      /movies/watch-providers/popular      Get a list of watch providers
-# --------------------------------------------------------------------------------------------
