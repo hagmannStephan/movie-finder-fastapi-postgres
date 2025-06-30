@@ -1,4 +1,4 @@
-from dotenv import load_dotenv
+# from dotenv import load_dotenv
 from fastapi import Depends, HTTPException
 from resources.services.auth_service import get_current_user
 from resources.services.postgresql_service import get_db
@@ -13,9 +13,10 @@ import random
 from typing import Dict, Any, Optional
 import resources.models.postgres as postgers_models
 
-load_dotenv()
+# load_dotenv()
 
-BASE_URL = os.getenv("BASE_URL")
+# BASE_URL = os.getenv("BASE_URL")
+BASE_URL = "https://api.themoviedb.org/3"
 TMDB_API_KEY = os.getenv("TMDB_API_KEY")
 
 headers = {
